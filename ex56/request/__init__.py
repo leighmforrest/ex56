@@ -34,7 +34,7 @@ def get_cached_response_with_etag(url, response_type="json"):
 
         # Check if the URL's response and ETag are already cached
         if url_hash in cache_db:
-            cached_data = json.loads(cache_db[url_hash].decode("utf-8"))
+            cached_data = json.loads(cache_db[url_hash])
             cached_etag = cached_data.get("etag")
             cached_body = cached_data.get("body")
 
