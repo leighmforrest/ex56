@@ -4,6 +4,21 @@ import hashlib
 import json
 
 
+def get_request(url, **kwargs):
+    return requests.get(url, **kwargs)
+
+
+def get_non_cached_response(url, params=None, headers=None, response_type="json"):
+    print(f"Retrieving direct response from url: {url}")
+    response = requests.get(url, params, headers)
+    if response_type == "json":
+        response_body = response.json()
+    else:
+        response_body = response.text  # For HTML
+
+    return response_body
+
+
 def get_cached_response_with_etag(url, response_type="json"):
     """
     Fetches a cached response with ETag support.
@@ -25,7 +40,7 @@ def get_cached_response_with_etag(url, response_type="json"):
 
             # Send a request with the cached ETag
             headers = {"If-None-Match": cached_etag}
-            response = requests.get(url, headers=headers)
+            response = get_request(url, headers=headers)
 
             if response.status_code == 304:
                 print("Cache hit: Resource not modified, using cached data")
@@ -45,7 +60,7 @@ def get_cached_response_with_etag(url, response_type="json"):
 
         print("Cache miss: Fetching new data from the web")
         # Fetch new data and cache it along with the ETag
-        response = requests.get(url)
+        response = get_request(url)
         if response_type == "json":
             response_body = response.json()
         else:
