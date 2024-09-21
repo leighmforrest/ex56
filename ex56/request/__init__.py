@@ -2,6 +2,7 @@ import requests
 import dbm
 import hashlib
 import json
+from pathlib import Path
 
 
 def get_request(url, **kwargs):
@@ -71,3 +72,13 @@ def get_cached_response_with_etag(url, response_type="json"):
         )
 
         return response_body
+
+def download_file(url, file_path, **kwargs):
+    # create directory if it does not exist
+    file_path = Path(file_path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with requests.get(url, stream=True, **kwargs) as response:
+        with open(file_path, "wb") as file:
+            for chunk in response.iter_content(chunk_size=10 * 1024):
+                file.write(chunk)

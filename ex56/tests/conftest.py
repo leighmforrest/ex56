@@ -1,4 +1,6 @@
 import pytest
+from pathlib import Path
+from .helpers import MockDownloadResponse
 
 
 @pytest.fixture
@@ -15,3 +17,16 @@ def mock_dbm(monkeypatch):
     monkeypatch.setattr("dbm.open", lambda *args, **kwargs: MockDBM())
 
     return mock_db
+
+
+@pytest.fixture
+def mock_request_get(monkeypatch):
+    def mock_get(url, stream=True, **kwargs):
+        return MockDownloadResponse(b"ItemOne,ItemTwo")
+    
+    monkeypatch.setattr("requests.get", mock_get)
+
+
+@pytest.fixture
+def tmp_file_path(tmpdir):
+    return Path(tmpdir) / "test.txt"

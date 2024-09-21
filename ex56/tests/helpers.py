@@ -1,6 +1,6 @@
 import json
 import hashlib
-from ..request import get_cached_response_with_etag
+from ex56.request import get_cached_response_with_etag
 
 
 class MockResponse(object):
@@ -15,6 +15,27 @@ class MockResponse(object):
     @property
     def text(self):
         return self.content
+
+
+class MockDownloadResponse(object):
+    """Class for mocking a requests.get call that downloads a file."""
+    def __init__(self, content):
+        self.content = content
+        self.iter_content_called = False
+    
+    def iter_content(self, chunk_size=1024):
+        self.iter_content_called = True
+        return [self.content[i:i + chunk_size] for i in range(0, len(self.content), chunk_size)]
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        pass
+
+    def raise_for_status(self):
+        pass
+
 
 
 def assert_data_result(data, result, response_type="json"):
