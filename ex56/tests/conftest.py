@@ -1,6 +1,17 @@
 import pytest
+import os
+import tempfile
 from pathlib import Path
 from .helpers import MockDownloadResponse
+
+
+@pytest.fixture
+def temp_file():
+    """Fixture to create and cleanup a temporary file."""
+    fd, path = tempfile.mkstemp()
+    os.close(fd)
+    yield path
+    os.remove(path)
 
 
 @pytest.fixture

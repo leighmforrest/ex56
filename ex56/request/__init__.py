@@ -1,5 +1,6 @@
 import requests
 import dbm
+import os
 import hashlib
 import json
 from pathlib import Path
@@ -84,3 +85,77 @@ def download_file_without_cache(url, file_path, **kwargs):
         with open(file_path, "wb") as file:
             for chunk in response.iter_content(chunk_size=10 * 1024):
                 file.write(chunk)
+
+
+import os
+import requests
+import hashlib
+import dbm
+
+def download_file_with_cache(url, file_path, cache_db='cache_db', **kwargs):
+    # Create or open cache database
+    with dbm.open(cache_db, 'c') as cache:
+        # Create a unique cache key based on the URL
+        cache_key = hashlib.sha256(url.encode()).hexdigest()
+
+        # Check if the URL is cached
+        if cache_key in cache:
+            print("Using cached file.")
+            # Read the cached file path
+            cached_file_path = str(cache[cache_key])
+            return cached_file_path
+        
+        # If not cached, proceed with downloading
+        response = requests.get(url, **kwargs)
+        response.raise_for_status()
+
+        # Save the file to the specified file path
+        with open(file_path, 'wb') as f:
+            f.write(response.content)
+
+        # Update the cache
+        cache[cache_key] = str(file_path)
+        print("File downloaded and cached.")
+
+        return file_path
+
+    """Download a file with caching support using ETag."""
+    file_path = Path(file_path)
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+
+    with dbm.open("cache", "c") as cache_db:
+        url_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()
+
+        # Check if we already have a cached file with a valid ETag
+        if url_hash in cache_db:
+            cached_data = json.loads(cache_db[url_hash])
+            cached_etag = cached_data.get("etag")
+            cached_file_path = cached_data.get("file_path")
+
+            # Check if the file already exists on disk
+            if os.path.exists(cached_file_path):
+                headers = {"If-None-Match": cached_etag}
+                response = get_request(url, headers=headers, stream=True, **kwargs)
+
+                if response.status_code == 304:
+                    print("Cache hit: File not modified, using cached file")
+                    return cached_file_path # return cached file path
+                else:
+                    print("File not found on disk, reloading.")
+                    response = get_request(url, headers=headers, stream=True, **kwargs)
+                
+            else:
+                print("Cache miss: No cached data, downloading.")
+                with get_request(url, stream=True, **kwargs) as response:
+                    with open(file_path, "wb") as file:
+                        for chunk in response.iter_content(chunk_size=10 * 1024):
+                            file.write(chunk)
+                    
+                    file_path_str  = str(file_path)
+
+                    cache_db[url_hash] = json.dumps({
+                        "etag": response.headers.get("ETag"),
+                        "file_path": file_path_str
+                    })
+
+                    return file_path_str

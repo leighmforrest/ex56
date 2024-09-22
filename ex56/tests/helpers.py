@@ -1,6 +1,6 @@
 import json
 import hashlib
-from ex56.request import get_cached_response_with_etag
+from ex56.request import get_cached_response_with_etag, download_file_with_cache
 
 
 class MockResponse(object):
@@ -52,3 +52,13 @@ def _test_cached_response(monkeypatch, mock_dbm, url, data, etag, response_type=
     result = get_cached_response_with_etag(url, response_type)
     assert_data_result(data, result, response_type)
     assert "etag" in mock_dbm[hashlib.sha256(url.encode("utf-8")).hexdigest()]
+
+
+def _test_cached_response_download(url, temp_file, mock_dbm, mock_request_get):
+    cache_key = hashlib.sha256(url.encode()).hexdigest()
+    file_path = download_file_with_cache(url, temp_file, cache_db=mock_dbm)
+    
+    with open(file_path, "rb") as f:
+        assert f.read() == b"ItemOne,ItemTwo"
+
+    assert cache_key in mock_dbm

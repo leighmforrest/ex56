@@ -1,8 +1,8 @@
 import pytest
 import json
 import hashlib
-from ..tests.helpers import MockResponse, assert_data_result, _test_cached_response
-from ..request import get_cached_response_with_etag, get_non_cached_response, download_file_without_cache
+from ..tests.helpers import MockResponse, assert_data_result, _test_cached_response, _test_cached_response_download
+from ..request import get_cached_response_with_etag, get_non_cached_response, download_file_without_cache, download_file_with_cache
 
 
 @pytest.mark.parametrize(
@@ -155,3 +155,18 @@ def test_download_file_without_cache(mock_request_get, tmp_file_path):
 
     assert tmp_file_path.exists()
     assert tmp_file_path.read_bytes() == b"ItemOne,ItemTwo"
+
+
+def test_download_file_with_cache(temp_file, mock_dbm, mock_request_get):
+    url = "http://example.com/file.txt"
+    _test_cached_response_download(url, temp_file, mock_dbm, mock_request_get)
+
+
+def test_file_with_cache_from_cache(temp_file, mock_dbm, mock_request_get):
+    url = "http://example.com/file.txt"
+    cache_key = hashlib.sha256(url.encode()).hexdigest()
+
+    _test_cached_response_download(url, temp_file, mock_dbm, mock_request_get)
+    cached_file_path = download_file_with_cache(url, temp_file, cache_db=mock_dbm)
+    assert cached_file_path == temp_file
+    assert cache_key in mock_dbm

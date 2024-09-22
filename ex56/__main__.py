@@ -1,7 +1,7 @@
 from pathlib import Path
 from urllib.parse import urlsplit
 from soup import get_soup, get_files_from_links
-from request import get_cached_response_with_etag, get_non_cached_response, download_file_without_cache
+from request import get_cached_response_with_etag, get_non_cached_response, download_file_without_cache, download_file_with_cache
 import pandas as pd 
 
 
@@ -23,6 +23,6 @@ if __name__ == "__main__":
     for spreadsheet in links:
         url = f"{BASE_URL}/{spreadsheet}"
         file_path = BASE_DIR / "data" / filename(url)
-        download_file_without_cache(url, file_path)
+        download_file_with_cache(url, file_path)
         ds = pd.read_excel(file_path).fillna(0)
         print(ds)
