@@ -2,7 +2,7 @@ import pytest
 import json
 import hashlib
 from ..tests.helpers import MockResponse, assert_data_result, _test_cached_response
-from ..request import get_cached_response_with_etag, get_non_cached_response, download_file
+from ..request import get_cached_response_with_etag, get_non_cached_response, download_file_without_cache
 
 
 @pytest.mark.parametrize(
@@ -150,8 +150,8 @@ def test_cache_update_on_cache_miss_new_etag(
     assert "Cache miss: Resource modified, fetching new data" in captured.out
 
 
-def test_download_file(mock_request_get, tmp_file_path):
-    download_file("http://example.com/file.txt", tmp_file_path)
+def test_download_file_without_cache(mock_request_get, tmp_file_path):
+    download_file_without_cache("http://example.com/file.txt", tmp_file_path)
 
     assert tmp_file_path.exists()
     assert tmp_file_path.read_bytes() == b"ItemOne,ItemTwo"
