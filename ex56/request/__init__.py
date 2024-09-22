@@ -74,6 +74,7 @@ def get_cached_response_with_etag(url, response_type="json"):
         return response_body
 
 def download_file(url, file_path, **kwargs):
+    """Download a file, given a url and a file path."""
     # create directory if it does not exist
     file_path = Path(file_path)
     file_path.parent.mkdir(parents=True, exist_ok=True)
