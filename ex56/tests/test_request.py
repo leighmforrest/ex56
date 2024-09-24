@@ -1,172 +1,180 @@
 import pytest
 import json
-import hashlib
-from ..tests.helpers import MockResponse, assert_data_result, _test_cached_response, _test_cached_response_download
-from ..request import get_cached_response_with_etag, get_non_cached_response, download_file_without_cache, download_file_with_cache
-
+from ..tests.helpers import MockResponse, MockDownloadResponse
+from ex56.request import (
+    get_cached_response,
+    get_full_url,
+    cache_key,
+    download_file_with_cache,
+)
 
 @pytest.mark.parametrize(
-    "url, data, etag, response_type",
+    "url, params, data, etag, response_type",
     [
-        ("http://www.example.com", "<h1>Hello World</h1>", "abc123", "html"),
-        ("http://www.pets.com", "<html><p>Hi There!</p><html>", "fakeName", "html"),
+        ("http://www.example.com", {"id": 3}, "<h1>Hello World</h1>", "abc123", "html"),
+        ("http://www.pets.com", None, "<html><p>Hi There!</p></html>", "fakeName", "html"),
         (
             "http://www.example.com",
-            json.dumps({"id": 1, "title": "Test Todo"}),
+            None,
+            {"id": 1, "title": "Test Todo"},
             "abc123",
             "json",
         ),
         (
             "http://www.pets.com",
-            json.dumps({"id": 123, "item": "Puppy Chow"}),
+            None,
+            {"id": 123, "item": "Puppy Chow"},
             "fakeName",
             "json",
         ),
     ],
 )
-def test_get_cached_response_with_etag(
-    monkeypatch, mock_dbm, url, data, etag, response_type
-):
-    mock_response = MockResponse(content=data, status_code=200, headers={"ETag": etag})
-
+def test_get_cached_response(monkeypatch, mock_dbm, url, params, data, etag, response_type):
+    full_url = get_full_url(url, params)
+    hashed_key = cache_key(full_url)
+    mock_response = MockResponse(data, status_code=200, headers={"ETag": etag})
+    
     monkeypatch.setattr("requests.get", lambda url, headers=None: mock_response)
-    _test_cached_response(
-        monkeypatch, mock_dbm, url, data, etag, response_type=response_type
-    )
 
-
-@pytest.mark.parametrize(
-    "url, data, etag, response_type",
-    [
-        ("http://www.example.com", "<h1>Hello World</h1>", "abc123", "html"),
-        ("http://www.pets.com", "<html><p>Hi There!</p><html>", "fakeName", "html"),
-        ("http://www.google.com", {"id": 1, "title": "Test Todo"}, "abc123", "json"),
-        ("http://www.xyz.com", {"id": 123, "item": "Puppy Chow"}, "fakeName", "json"),
-    ],
-)
-def test_get_cached_response_304(monkeypatch, mock_dbm, url, data, etag, response_type):
-    url_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()
-    mock_response_304 = MockResponse(content="", status_code=304)
-
-    mock_dbm[url_hash] = json.dumps({"etag": etag, "body": data}).encode("utf-8")
-
-    monkeypatch.setattr("requests.get", lambda url, headers=None: mock_response_304)
-    result = get_cached_response_with_etag(url, response_type=response_type)
+    result = get_cached_response(url, params, response_type=response_type)
     assert result == data
+    assert hashed_key in mock_dbm
 
 
 @pytest.mark.parametrize(
-    "url, data, headers, response_type",
+    "url, params, data, etag, response_type",
     [
-        ("http://www.example.com", "<h1>Hello World</h1>", {}, "html"),
-        ("http://www.pets.com", "<html><p>Hi There!</p><html>", {"id": 5}, "html"),
-        (
-            "http://www.google.com",
-            json.dumps({"id": 1, "title": "Test Todo"}),
-            {"green_id": 1234},
-            "json",
-        ),
-        (
-            "http://www.xyz.com",
-            json.dumps({"id": 123, "item": "Puppy Chow"}),
-            {"arg": "test"},
-            "json",
-        ),
-    ],
-)
-def test_get_uncached_response(monkeypatch, url, data, headers, response_type):
-    mock_response = MockResponse(content=data, status_code=200, headers=headers)
-
-    monkeypatch.setattr(
-        "requests.get", lambda url, data, headers=headers: mock_response
-    )
-    result = get_non_cached_response(url, response_type=response_type)
-    assert_data_result(data, result, response_type)
-
-
-@pytest.mark.parametrize(
-    "url, data, etag, new_data, new_etag, response_type",
-    [
+        ("http://www.example.com", {"id": 3}, "<h1>Hello World</h1>", "abc123", "html"),
+        ("http://www.pets.com", None, "<html><p>Hi There!</p></html>", "fakeName", "html"),
         (
             "http://www.example.com",
-            "<h1>Hello World</h1>",
+            None,
+            {"id": 1, "title": "Test Todo"},
             "abc123",
-            "<h1>Hello World Too</h1>",
-            "321cba",
-            "html",
+            "json",
         ),
         (
             "http://www.pets.com",
-            "<html><p>Hi There!</p><html>",
+            None,
+            {"id": 123, "item": "Puppy Chow"},
             "fakeName",
-            "<html><p>Hi There Again!</p><html>",
-            "fakeNameTwo",
-            "html",
-        ),
-        (
-            "http://www.google.com",
-            json.dumps({"id": 1, "title": "Test Todo"}),
-            "abc123",
-            json.dumps({"id": 1, "title": "Test Todo"}),
-            "NewEtag",
-            "json",
-        ),
-        (
-            "http://www.xyz.com",
-            json.dumps({"id": 123, "item": "Puppy Chow"}),
-            "fakeName",
-            json.dumps({"id": 123, "item": "Dog Chow"}),
-            "fakeNameIsAllNew",
             "json",
         ),
     ],
 )
-def test_cache_update_on_cache_miss_new_etag(
-    capfd, monkeypatch, mock_dbm, url, data, etag, new_data, new_etag, response_type
-):
-    # Make sure cache exists
-    _test_cached_response(
-        monkeypatch, mock_dbm, url, data, etag, response_type=response_type
-    )
+def test_get_cached_response_304(monkeypatch, mock_dbm, url, params, data, etag, response_type):
+    full_url = get_full_url(url, params)
+    hashed_key = cache_key(full_url)
+    mock_dbm[hashed_key] = json.dumps({"etag": etag, "body": data}).encode("utf-8")
 
-    # Make a new MockResponse
-    mock_new_response = MockResponse(
-        content=new_data, status_code=200, headers={"ETag": new_etag}
-    )
+    # Mock a 304 response
+    mock_response = MockResponse("", status_code=304)
+    monkeypatch.setattr("requests.get", lambda url, headers=None: mock_response)
+
+    result = get_cached_response(url, params, response_type=response_type)
+    assert result == data
+    assert hashed_key in mock_dbm
+
+
+@pytest.mark.parametrize(
+    "url, params, old_data, new_data, etag, response_type",
+    [
+        ("http://www.example.com", {"id": 3}, "<h1>Hello Old World</h1>", "<h1>Hello World</h1>", "abc123", "html"),
+        ("http://www.pets.com", None, "<html><p>Hi There Oldster!</p></html>", "<html><p>Hi There!</p></html>", "fakeName", "html"),
+        (
+            "http://www.example.com",
+            None,
+            {"id": 1, "title": "Old Test Todo"},
+            {"id": 1, "title": "Test Todo"},
+            "abc123",
+            "json",
+        ),
+        (
+            "http://www.pets.com",
+            None,
+            {"id": 5678, "east": "west"},
+            {"id": 123, "item": "Puppy Chow"},
+            "fakeName",
+            "json",
+        ),
+    ],
+)
+def test_get_response_changed_content(capfd, monkeypatch, mock_dbm, url, params, old_data, new_data, etag, response_type):
+    full_url = get_full_url(url, params)
+    hashed_key = cache_key(full_url)
+    mock_dbm[hashed_key] = json.dumps({"etag": f"{etag}OldSchoolTag", "body": old_data}).encode("utf-8")
+
+    mock_new_response = MockResponse(content=new_data, status_code=200, headers={"ETag": etag})
     monkeypatch.setattr("requests.get", lambda url, headers=None: mock_new_response)
 
-    url_hash = hashlib.sha256(url.encode("utf-8")).hexdigest()
-
-    result = get_cached_response_with_etag(url, response_type=response_type)
-    assert_data_result(new_data, result, response_type)
-
-    assert url_hash in mock_dbm
-    cached_data = json.loads(mock_dbm[url_hash])
-    assert cached_data["etag"] == new_etag
-    assert_data_result(new_data, cached_data["body"], response_type=response_type)
+    result = get_cached_response(url, params, response_type=response_type)
+    assert result == new_data
+    assert hashed_key in mock_dbm
 
     # Capture print output
     captured = capfd.readouterr()
     assert "Cache miss: Resource modified, fetching new data" in captured.out
 
 
-def test_download_file_without_cache(mock_request_get, tmp_file_path):
-    download_file_without_cache("http://example.com/file.txt", tmp_file_path)
+def test_cached_response_download(monkeypatch, capfd, temp_file, mock_dbm):
+    params = {"id": 1}
+    url = "http://www.example.com/example.txt"
+    full_url = get_full_url(url, params)
+    hashed_key = cache_key(full_url)
 
-    assert tmp_file_path.exists()
-    assert tmp_file_path.read_bytes() == b"ItemOne,ItemTwo"
+    # First download to simulate caching
+    mock_response = MockDownloadResponse(content=b"ItemOne,ItemTwo", status_code=200, headers={"ETag": "some-etag"})
+    monkeypatch.setattr("requests.get", lambda *args, **kwargs: mock_response)
+
+    file_path = download_file_with_cache(url, temp_file, params)
+
+    with open(file_path, "rb") as f:
+        assert f.read() == b"ItemOne,ItemTwo"
+
+    assert hashed_key in mock_dbm
+
+    # Manually add the cached response to the mock_dbm
+    mock_dbm[hashed_key] = json.dumps({
+        "etag": "some-etag",
+        "file_path": str(file_path)
+    })
+
+    # Simulate a 304 Not Modified response
+    mock_response_304 = MockDownloadResponse(content=b"", status_code=304)
+    monkeypatch.setattr("requests.get", lambda *args, **kwargs: mock_response_304)
+
+    file_path_304 = download_file_with_cache(url, temp_file, params)
+
+    # Check that the cached file path is returned
+    assert file_path_304 == file_path
+
+    captured = capfd.readouterr()
+    assert "Cache hit: File not modified, using cached file." in captured.out
 
 
-def test_download_file_with_cache(temp_file, mock_dbm, mock_request_get):
-    url = "http://example.com/file.txt"
-    _test_cached_response_download(url, temp_file, mock_dbm, mock_request_get)
+def test_cached_response_download_invalid_json(monkeypatch, capfd, temp_file, mock_dbm):
+    params = {"id": 1}
+    url = "http://www.example.com/example.txt"
+    full_url = get_full_url(url, params)
+    hashed_key = cache_key(full_url)
 
+    # Inject invalid JSON into the mock_dbm
+    mock_dbm[hashed_key] = b"invalid_json"
 
-def test_file_with_cache_from_cache(temp_file, mock_dbm, mock_request_get):
-    url = "http://example.com/file.txt"
-    cache_key = hashlib.sha256(url.encode()).hexdigest()
+    # Set up the mock response for the first download
+    mock_response = MockDownloadResponse(content=b"ItemOne,ItemTwo", status_code=200, headers={"ETag": "some-etag"})
+    monkeypatch.setattr("requests.get", lambda *args, **kwargs: mock_response)
 
-    _test_cached_response_download(url, temp_file, mock_dbm, mock_request_get)
-    cached_file_path = download_file_with_cache(url, temp_file, cache_db=mock_dbm)
-    assert cached_file_path == temp_file
-    assert cache_key in mock_dbm
+    # Call the function to trigger the JSONDecodeError
+    file_path = download_file_with_cache(url, temp_file, params)
+
+    # Check if the file was downloaded successfully
+    with open(file_path, "rb") as f:
+        assert f.read() == b"ItemOne,ItemTwo"
+
+    # Ensure the cache was updated after downloading
+    assert hashed_key in mock_dbm
+
+    # Check for the warning output due to invalid JSON
+    captured = capfd.readouterr()
+    assert "Warning: Cached data is not valid JSON, proceeding to download the file." in captured.out

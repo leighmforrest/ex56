@@ -1,8 +1,6 @@
-import re
 from bs4 import BeautifulSoup
 
-
-get_soup = lambda markup: BeautifulSoup(markup, features="html.parser")
+get_soup = lambda markup: BeautifulSoup(markup, features='html.parser')
 
 
 def get_files_from_links(soup, file_extension="pdf"):

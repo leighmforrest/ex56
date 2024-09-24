@@ -1,8 +1,11 @@
 import pytest
-import os
 import tempfile
 from pathlib import Path
-from .helpers import MockDownloadResponse
+import os
+import json
+from .helpers import MockResponse, MockDownloadResponse
+from .api_data import courses_data, course_data
+from ..request import get_full_url
 
 
 @pytest.fixture
@@ -12,6 +15,11 @@ def temp_file():
     os.close(fd)
     yield path
     os.remove(path)
+
+
+@pytest.fixture
+def tmp_file_path(tmpdir):
+    return Path(tmpdir) / "test.txt"
 
 
 @pytest.fixture
@@ -39,5 +47,20 @@ def mock_request_get(monkeypatch):
 
 
 @pytest.fixture
-def tmp_file_path(tmpdir):
-    return Path(tmpdir) / "test.txt"
+def mock_response_courses(monkeypatch):
+    data = json.loads(courses_data)
+    
+    def mock_get(url, **kwargs):
+        return MockResponse(data, 200)
+    
+    monkeypatch.setattr("requests.get", mock_get)
+    
+
+@pytest.fixture
+def mock_response_course(monkeypatch):
+    data = json.loads(course_data)
+    
+    def mock_get(url, **kwargs):
+        return MockResponse(data, 200)
+    
+    monkeypatch.setattr("requests.get", mock_get)
