@@ -45,22 +45,4 @@ def mock_request_get(monkeypatch):
     
     monkeypatch.setattr("requests.get", mock_get)
 
-
-@pytest.fixture
-def mock_response_courses(monkeypatch):
-    data = json.loads(courses_data)
-    
-    def mock_get(url, **kwargs):
-        return MockResponse(data, 200)
-    
-    monkeypatch.setattr("requests.get", mock_get)
-    
-
-@pytest.fixture
-def mock_response_course(monkeypatch):
-    data = json.loads(course_data)
-    
-    def mock_get(url, **kwargs):
-        return MockResponse(data, 200)
-    
-    monkeypatch.setattr("requests.get", mock_get)
+# Fixtures for use for testing the videos module
