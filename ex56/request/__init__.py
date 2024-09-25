@@ -9,7 +9,8 @@ import requests
 # Function to generate a SHA-256 hash of the full url to use as a cache key
 cache_key = lambda full_url: hashlib.sha256(full_url.encode('utf-8')).hexdigest()
 
-get_request = lambda url, headers: requests.get(url, headers=headers)
+# function to get html or json data
+get_request = lambda full_url, headers: requests.get(full_url, headers=headers)
 
 def get_full_url(url, params=None):
     """Get the full url, including query string parameters."""
@@ -47,21 +48,21 @@ def get_cached_response(url, params=None, headers={}, response_type="json"):
             response = get_request(full_url, headers=headers)
 
             if response.status_code == 304:
-                print("Cache hit: Resource not modified, using cached data")
-                
-                return cached_body  # For non-JSON responses
+                print(f"Cache hit: {full_url} not modified, using cached data")
+                if isinstance(cached_body, str) and response_type == "json": return json.loads(cached_body) 
+                else: return cached_body
 
-            print("Cache miss: Resource modified, fetching new data")
+            print(f"Cache miss: Resource modified, fetching new data from {full_url}")
             # Update the cache with the new ETag and response body
             response_body = get_response_data(response, response_type)
-            body_data = response_body if response_type == "json" else response_body
+            body_data = response_body
     
             cache_db[hashed_key] = json.dumps(
                 {"etag": response.headers.get("ETag"), "body": body_data}
             )
             return body_data
 
-        print("Cache miss: Fetching new data from the web")
+        print(f"Cache miss: Fetching new data from {full_url}")
         # Fetch new data and cache it along with the ETag
         response = get_request(full_url, headers=headers)
         response_body = get_response_data(response, response_type)

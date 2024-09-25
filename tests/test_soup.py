@@ -23,6 +23,7 @@ def test_get_soup(markup):
 
     assert str(soup) == markup
 
+
 def test_get_files_from_links():
     markup = BASE_MARKUP.format(LINK_MARKUP)
     soup = get_soup(markup)

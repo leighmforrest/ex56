@@ -113,7 +113,7 @@ def test_get_response_changed_content(capfd, monkeypatch, mock_dbm, url, params,
 
     # Capture print output
     captured = capfd.readouterr()
-    assert "Cache miss: Resource modified, fetching new data" in captured.out
+    assert f"Cache miss: Resource modified, fetching new data from {full_url}" in captured.out
 
 
 def test_cached_response_download(monkeypatch, capfd, temp_file, mock_dbm):
