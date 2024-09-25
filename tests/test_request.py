@@ -1,6 +1,6 @@
 import pytest
 import json
-from ..tests.helpers import MockResponse, MockDownloadResponse
+from .helpers import MockResponse, MockDownloadResponse
 from ex56.request import (
     get_cached_response,
     get_full_url,

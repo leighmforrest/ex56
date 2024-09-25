@@ -54,11 +54,12 @@ def get_cached_response(url, params=None, headers={}, response_type="json"):
             print("Cache miss: Resource modified, fetching new data")
             # Update the cache with the new ETag and response body
             response_body = get_response_data(response, response_type)
-            
+            body_data = response_body if response_type == "json" else response_body
+    
             cache_db[hashed_key] = json.dumps(
-                {"etag": response.headers.get("ETag"), "body": json.dumps(response_body) if response_type == "json" else response_body}
+                {"etag": response.headers.get("ETag"), "body": body_data}
             )
-            return response_body
+            return body_data
 
         print("Cache miss: Fetching new data from the web")
         # Fetch new data and cache it along with the ETag

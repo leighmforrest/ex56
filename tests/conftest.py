@@ -5,7 +5,7 @@ import os
 import json
 from .helpers import MockResponse, MockDownloadResponse
 from .api_data import courses_data, course_data
-from ..request import get_full_url
+from ex56.request import get_full_url
 
 
 @pytest.fixture

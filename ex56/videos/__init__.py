@@ -20,17 +20,18 @@ def get_course_ids(cached=True):
     url = f"{BASE_URL}/course"
     request_func = request(cached)
     data = request_func(url)
+    
     ids = [datum['id'] for datum in data]
     
     return ids
 
 
-def get_course(course_id, cached=True):
-    url = f"{BASE_URL}/course"
-    params = {
-        "course_id": course_id,
-        "full": True
-    }
-    data = get_cached_response(url, params)
+# def get_course(course_id, cached=True):
+#     url = f"{BASE_URL}/course"
+#     params = {
+#         "course_id": course_id,
+#         "full": True
+#     }
+#     data = get_cached_response(url, params)
     
-    return data
+#     return data
