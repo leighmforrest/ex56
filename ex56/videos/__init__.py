@@ -1,5 +1,5 @@
 from pprint import pprint
-from ex56.request import get_cached_response, get_response_data
+from ..request import get_cached_response, get_response_data
 
 BASE_URL = "https://learncodethehardway.com/api"
 
@@ -26,12 +26,12 @@ def get_course_ids(cached=True):
     return ids
 
 
-# def get_course(course_id, cached=True):
-#     url = f"{BASE_URL}/course"
-#     params = {
-#         "course_id": course_id,
-#         "full": True
-#     }
-#     data = get_cached_response(url, params)
+def get_course(course_id, cached=True):
+    url = f"{BASE_URL}/course"
+    params = {
+        "course_id": course_id,
+        "full": True
+    }
+    data = get_cached_response(url, params)
     
-#     return data
+    return data
