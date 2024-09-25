@@ -1,22 +1,9 @@
 from pprint import pprint
-import json
 import csv
 from pathlib import Path
-from ..request import get_cached_response, get_response_data
+from ex56.request import get_cached_response, get_response_data
 
 BASE_URL = "https://learncodethehardway.com/api"
-
-REQUEST = {
-    "cached": get_cached_response,
-    "noncached": get_response_data
-}
-
-
-def request(cached=True):
-    if cached:
-        return REQUEST["cached"]
-    else:
-        return REQUEST["noncached"]
 
 
 def write_csv(data, target_path):
@@ -33,9 +20,15 @@ def write_csv(data, target_path):
 
 
 def get_courses(target_dir, filename="courses.csv",cached=True):
+    """Write a csv of course data and return a list of all module ids."""
     target_path = Path(target_dir / filename)
-    api_request_func = request(cached)
-    courses = []
+    
+    if cached:
+        api_request_func = get_cached_response
+    else:
+        api_request_func = get_response_data
+
+
     fields = ["id", "title", "description"]
     
     # create an array of course ids

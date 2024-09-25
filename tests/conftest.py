@@ -4,8 +4,6 @@ from pathlib import Path
 import os
 import json
 from .helpers import MockResponse, MockDownloadResponse
-from .api_data import courses_data, course_data
-from ex56.request import get_full_url
 
 
 @pytest.fixture
@@ -46,3 +44,17 @@ def mock_request_get(monkeypatch):
     monkeypatch.setattr("requests.get", mock_get)
 
 # Fixtures for use for testing the videos module
+@pytest.fixture
+def sample_courses():
+   return [
+    {"id": 1, "title": "course 1", "green": "blue"},
+    {"id": 2, "title": "course 2", "green": "red"}
+]
+
+
+@pytest.fixture
+def sample_course_data():
+   return [
+    {"id": 1, "title": "course 1", "description": "Description for course 1", "green": "blue", "modules": [{"id": 101}, {"id": 102}]},
+    {"id": 2, "title": "course 2", "description": "Description for course 2", "green": "blue", "modules": [{"id": 201}, {"id": 202}]},
+]
