@@ -4,6 +4,7 @@ from pathlib import Path
 import os
 import json
 from .helpers import MockResponse, MockDownloadResponse
+import ex56.videos
 
 
 @pytest.fixture
@@ -40,21 +41,47 @@ def mock_dbm(monkeypatch):
 def mock_request_get(monkeypatch):
     def mock_get(url, stream=True, **kwargs):
         return MockDownloadResponse(b"ItemOne,ItemTwo")
-    
+
     monkeypatch.setattr("requests.get", mock_get)
+
 
 # Fixtures for use for testing the videos module
 @pytest.fixture
-def sample_courses():
-   return [
-    {"id": 1, "title": "course 1", "green": "blue"},
-    {"id": 2, "title": "course 2", "green": "red"}
-]
+def courses():
+    return [
+        {"id": 1, "title": "course 1", "green": "blue"},
+        {"id": 2, "title": "course 2", "green": "red"},
+    ]
 
 
 @pytest.fixture
-def sample_course_data():
-   return [
-    {"id": 1, "title": "course 1", "description": "Description for course 1", "green": "blue", "modules": [{"id": 101}, {"id": 102}]},
-    {"id": 2, "title": "course 2", "description": "Description for course 2", "green": "blue", "modules": [{"id": 201}, {"id": 202}]},
-]
+def course_data():
+    return [
+        {
+            "id": 1,
+            "title": "course 1",
+            "description": "Description for course 1",
+            "green": "blue",
+            "modules": [{"id": 101}, {"id": 102}],
+        },
+        {
+            "id": 2,
+            "title": "course 2",
+            "description": "Description for course 2",
+            "green": "blue",
+            "modules": [{"id": 201}, {"id": 202}],
+        },
+    ]
+
+
+@pytest.fixture
+def mock_course_api_request(monkeypatch, course_data, courses):
+    def mock_course_get(url, params=None):
+        if params:
+            course_id = params["course_id"]
+            return next(course for course in course_data if course["id"] == course_id)
+        return courses
+
+    # monkeypatch the cached and noncached requests
+    monkeypatch.setattr(ex56.videos, "get_response_data", mock_course_get)
+    monkeypatch.setattr(ex56.videos, "get_cached_response", mock_course_get)

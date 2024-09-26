@@ -1,5 +1,10 @@
 import json
-from ex56.request import get_full_url, cache_key, get_cached_response, download_file_with_cache
+from ex56.request import (
+    get_full_url,
+    cache_key,
+    get_cached_response,
+    download_file_with_cache,
+)
 
 
 class MockResponse(object):
@@ -19,22 +24,25 @@ class MockResponse(object):
 
 class MockDownloadResponse(object):
     """Class for mocking a requests.get call that downloads a file."""
+
     def __init__(self, content, status_code=200, headers=None):
         self.content = content
         self.status_code = status_code
         self.headers = headers or {}
         self.iter_content_called = False
-    
+
     def iter_content(self, chunk_size=1024):
         self.iter_content_called = True
-        return [self.content[i:i + chunk_size] for i in range(0, len(self.content), chunk_size)]
-    
+        return [
+            self.content[i : i + chunk_size]
+            for i in range(0, len(self.content), chunk_size)
+        ]
+
     def __enter__(self):
         return self
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         pass
 
     def raise_for_status(self):
         pass
-

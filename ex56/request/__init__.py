@@ -1,5 +1,5 @@
 import dbm
-import os 
+import os
 import hashlib
 from pathlib import Path
 import json
@@ -7,10 +7,11 @@ import requests
 
 
 # Function to generate a SHA-256 hash of the full url to use as a cache key
-cache_key = lambda full_url: hashlib.sha256(full_url.encode('utf-8')).hexdigest()
+cache_key = lambda full_url: hashlib.sha256(full_url.encode("utf-8")).hexdigest()
 
 # function to get html or json data
 get_request = lambda full_url, headers: requests.get(full_url, headers=headers)
+
 
 def get_full_url(url, params=None):
     """Get the full url, including query string parameters."""
@@ -49,14 +50,16 @@ def get_cached_response(url, params=None, headers={}, response_type="json"):
 
             if response.status_code == 304:
                 print(f"Cache hit: {full_url} not modified, using cached data")
-                if isinstance(cached_body, str) and response_type == "json": return json.loads(cached_body) 
-                else: return cached_body
+                if isinstance(cached_body, str) and response_type == "json":
+                    return json.loads(cached_body)
+                else:
+                    return cached_body
 
             print(f"Cache miss: Resource modified, fetching new data from {full_url}")
             # Update the cache with the new ETag and response body
             response_body = get_response_data(response, response_type)
             body_data = response_body
-    
+
             cache_db[hashed_key] = json.dumps(
                 {"etag": response.headers.get("ETag"), "body": body_data}
             )
@@ -68,7 +71,14 @@ def get_cached_response(url, params=None, headers={}, response_type="json"):
         response_body = get_response_data(response, response_type)
 
         cache_db[hashed_key] = json.dumps(
-            {"etag": response.headers.get("ETag"), "body": json.dumps(response_body) if response_type == "json" else response_body}
+            {
+                "etag": response.headers.get("ETag"),
+                "body": (
+                    json.dumps(response_body)
+                    if response_type == "json"
+                    else response_body
+                ),
+            }
         )
 
         return response_body
@@ -83,7 +93,7 @@ def download_file_with_cache(url, file_path, params=None, **kwargs):
     full_url = get_full_url(url, params)
     url_hash = cache_key(full_url)
 
-    with dbm.open("cache", 'c') as cache:
+    with dbm.open("cache", "c") as cache:
         # Check if we have a cached file with a valid ETag
         cached_data = cache.get(url_hash)
 
@@ -102,7 +112,9 @@ def download_file_with_cache(url, file_path, params=None, **kwargs):
                         print("Cache hit: File not modified, using cached file.")
                         return cached_file_path
             except json.JSONDecodeError:
-                print("Warning: Cached data is not valid JSON, proceeding to download the file.")
+                print(
+                    "Warning: Cached data is not valid JSON, proceeding to download the file."
+                )
 
         # Download the file if not cached or modified
         print("Downloading file.")
@@ -115,10 +127,9 @@ def download_file_with_cache(url, file_path, params=None, **kwargs):
                 file.write(chunk)
 
         # Update the cache with the new file info
-        cache[url_hash] = json.dumps({
-            "etag": response.headers.get("ETag"),
-            "file_path": str(file_path)
-        })
-        
+        cache[url_hash] = json.dumps(
+            {"etag": response.headers.get("ETag"), "file_path": str(file_path)}
+        )
+
         print("File downloaded and cached.")
         return str(file_path)
