@@ -22,7 +22,7 @@ def test_get_courses_csv_file_created(tmp_path, mock_course_api_request, course_
 
     get_courses(target_dir)
     csv_file = target_dir / filename
-    assert csv_file.exists()
+    assert csv_file.exists(), "csv does not exist in the target directory."
 
     with csv_file.open() as file:
         reader = csv.DictReader(file)
