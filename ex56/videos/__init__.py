@@ -1,7 +1,7 @@
 from pprint import pprint
 import csv
 from pathlib import Path
-from ex56.request import get_cached_response, get_response_data
+from ex56.request import get_cached_response, get_uncached_response
 
 BASE_URL = "https://learncodethehardway.com/api"
 
@@ -26,7 +26,7 @@ def get_courses(target_dir, filename="courses.csv", cached=True):
     if cached:
         api_request_func = get_cached_response
     else:
-        api_request_func = get_response_data
+        api_request_func = get_uncached_response
 
     fields = ["id", "title", "description"]
 

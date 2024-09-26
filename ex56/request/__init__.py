@@ -27,6 +27,15 @@ def get_response_data(response, response_type="json"):
         return response.text  # For HTML
 
 
+def get_uncached_response(url, params=None, headers={}, response_type="json"):
+    """Get a response directly from url."""
+    full_url = get_full_url(url, params)
+    response = get_request(full_url, headers)
+    response_data = get_response_data(response, response_type)
+
+    return response_data
+
+
 def get_cached_response(url, params=None, headers={}, response_type="json"):
     """
     Fetches a cached response with ETag support.
@@ -85,6 +94,8 @@ def get_cached_response(url, params=None, headers={}, response_type="json"):
 
 
 def download_file_with_cache(url, file_path, params=None, **kwargs):
+    """Download a file at a given url; if cached, get the file in the file_path."""
+
     # Create the directory for the file if it doesn't exist
     file_path = Path(file_path)
     file_path.parent.mkdir(parents=True, exist_ok=True)

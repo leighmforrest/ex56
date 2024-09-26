@@ -6,7 +6,45 @@ from ex56.request import (
     get_full_url,
     cache_key,
     download_file_with_cache,
+    get_uncached_response
 )
+
+
+@pytest.mark.parametrize(
+    "url, params, data, response_type",
+    [
+        ("http://www.example.com", {"id": 3}, "<h1>Hello World</h1>", "html"),
+        (
+            "http://www.pets.com",
+            None,
+            "<html><p>Hi There!</p></html>",
+            "html",
+        ),
+        (
+            "http://www.example.com",
+            None,
+            {"id": 1, "title": "Test Todo"},
+            "json",
+        ),
+        (
+            "http://www.pets.com",
+            None,
+            {"id": 123, "item": "Puppy Chow"},
+            "json",
+        ),
+    ],
+)
+def test_get_uncached_response(
+    monkeypatch, url, params, data, response_type
+):
+    full_url = get_full_url(url, params)
+    mock_response = MockResponse(data, status_code=200)
+
+    monkeypatch.setattr("requests.get", lambda url, headers=None: mock_response)
+
+    result = get_uncached_response(url, params, response_type=response_type)
+    assert result == data
+
 
 
 @pytest.mark.parametrize(

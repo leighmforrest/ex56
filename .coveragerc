@@ -1,2 +1,2 @@
 [run]
-omit = ex56/tests/*
+omit = tests/*

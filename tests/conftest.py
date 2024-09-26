@@ -2,9 +2,7 @@ import pytest
 import tempfile
 from pathlib import Path
 import os
-import json
 from .helpers import MockResponse, MockDownloadResponse
-import ex56.videos
 
 
 @pytest.fixture
@@ -83,5 +81,5 @@ def mock_course_api_request(monkeypatch, course_data, courses):
         return courses
 
     # monkeypatch the cached and noncached requests
-    monkeypatch.setattr(ex56.videos, "get_response_data", mock_course_get)
-    monkeypatch.setattr(ex56.videos, "get_cached_response", mock_course_get)
+    monkeypatch.setattr("ex56.videos.get_uncached_response", mock_course_get)
+    monkeypatch.setattr("ex56.videos.get_cached_response", mock_course_get)

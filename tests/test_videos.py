@@ -3,9 +3,10 @@ import csv
 from ex56.videos import get_courses
 
 
-def test_get_courses_module_ids(tmp_path, mock_course_api_request):
+@pytest.mark.parametrize("cached", [True, False])
+def test_get_courses_module_ids(tmp_path, cached, mock_course_api_request):
     target_dir = tmp_path
-    module_ids = get_courses(target_dir)
+    module_ids = get_courses(target_dir, cached=cached)
     assert module_ids == [
         101,
         102,
