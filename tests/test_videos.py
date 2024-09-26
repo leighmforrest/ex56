@@ -33,4 +33,4 @@ def test_get_courses_csv_file_created(tmp_path, mock_course_api_request, course_
         {"id": "1", "title": "course 1", "description": "Description for course 1"},
         {"id": "2", "title": "course 2", "description": "Description for course 2"},
     ]
-    assert rows == expected_data
+    assert rows == expected_data, "expected data does not match rows."
