@@ -6,6 +6,14 @@ from ex56.request import get_cached_response, get_uncached_response
 BASE_URL = "https://learncodethehardway.com/api"
 
 
+def get_api_request_func(cached=True):
+    """Get an api request function based on whether the request is cached or not."""
+    if cached:
+        return get_cached_response
+    else:
+        return get_uncached_response
+
+
 def write_csv(data, target_path):
     """Helper to write a list of dictionaries to target_path"""
     # we need a list of fields first
@@ -19,41 +27,54 @@ def write_csv(data, target_path):
             writer.writerow(data_row)
 
 
+def filter_data(data_ids, api_request_func, data_url, fields, id_field_name):
+        """Return filtered array of dictionaries, given a list of 
+            ids, a request api function, a string of the id parameter name, and a list of needed fields.
+        """
+        data_list = []
+
+        for data_id in data_ids:
+            params = {id_field_name: data_id, "full": True}
+            data = api_request_func(data_url, params)
+
+            # filter to needed fields
+            filtered_data = {
+                field: value for field, value in data.items() if field in fields
+            }
+            data_list.append(filtered_data)
+
+        return data_list
+
+
+def get_ids(data_items, related_id_field, id_field = "id"):
+    data_ids = []
+
+    for data_item in data_items:
+        data_ids.extend([data[id_field] for data in data_item[related_id_field]])
+        del data_item[related_id_field]
+
+    return data_ids
+
+
 def get_courses(target_dir, filename="courses.csv", cached=True):
     """Write a csv of course data and return a list of all module ids."""
     target_path = Path(target_dir / filename)
-
-    if cached:
-        api_request_func = get_cached_response
-    else:
-        api_request_func = get_uncached_response
-
-    fields = ["id", "title", "description"]
+    fields = ["id", "title", "description", "modules"]
+    api_request_func = get_api_request_func(cached)
 
     # create an array of course ids
     courses_url = f"{BASE_URL}/course"
-    courses = api_request_func(courses_url)
-    course_ids = [course["id"] for course in courses]
-    course_data = []
-    module_ids = []
+    initial_courses = api_request_func(courses_url)
+    course_ids = [course["id"] for course in initial_courses]
 
     # fetch data for each indvidually, and create an array for them
-    for course_id in course_ids:
-        params = {"course_id": course_id, "full": True}
-        course = api_request_func(courses_url, params)
+    courses = filter_data(course_ids, api_request_func, courses_url, fields, "course_id")
 
-        # filter to needed fields
-        filtered_course = {
-            field: value for field, value in course.items() if field in fields
-        }
-        course_data.append(filtered_course)
-
-        # get ids for their related modules
-        module_ids.extend([module["id"] for module in course["modules"]])
-        del course["modules"]
+    # get ids for their related modules
+    module_ids = get_ids(courses, "modules", "id")
 
     # write them to the filename in the target dir
-    write_csv(course_data, target_path)
+    write_csv(courses, target_path)
 
     # return module ids
     return module_ids
