@@ -6,7 +6,7 @@ from ex56.request import (
     get_full_url,
     cache_key,
     download_file_with_cache,
-    get_uncached_response
+    get_uncached_response,
 )
 
 
@@ -34,9 +34,7 @@ from ex56.request import (
         ),
     ],
 )
-def test_get_uncached_response(
-    monkeypatch, url, params, data, response_type
-):
+def test_get_uncached_response(monkeypatch, url, params, data, response_type):
     full_url = get_full_url(url, params)
     mock_response = MockResponse(data, status_code=200)
 
@@ -44,7 +42,6 @@ def test_get_uncached_response(
 
     result = get_uncached_response(url, params, response_type=response_type)
     assert result == data
-
 
 
 @pytest.mark.parametrize(

@@ -73,6 +73,40 @@ def course_data():
 
 
 @pytest.fixture
+def module_data():
+    return [
+        {
+            "id": 101,
+            "title": "Module 101",
+            "description": "Description for Module 101",
+            "green": "blue",
+            "lessons": [{"id": 1101}, {"id": 1102}],
+        },
+        {
+            "id": 102,
+            "title": "Module 102",
+            "description": "Description for Module 102",
+            "green": "blue",
+            "lessons": [{"id": 2201}, {"id": 2202}],
+        },
+        {
+            "id": 201,
+            "title": "Module 201",
+            "description": "Description for Module 201",
+            "green": "blue",
+            "lessons": [{"id": 3201}, {"id": 3202}],
+        },
+        {
+            "id": 202,
+            "title": "Module 202",
+            "description": "Description for Module 202",
+            "green": "blue",
+            "lessons": [{"id": 4201}, {"id": 4202}],
+        },
+    ]
+
+
+@pytest.fixture
 def mock_course_api_request(monkeypatch, course_data, courses):
     def mock_course_get(url, params=None):
         if params:
@@ -83,3 +117,16 @@ def mock_course_api_request(monkeypatch, course_data, courses):
     # monkeypatch the cached and noncached requests
     monkeypatch.setattr("ex56.videos.get_uncached_response", mock_course_get)
     monkeypatch.setattr("ex56.videos.get_cached_response", mock_course_get)
+
+
+@pytest.fixture
+def mock_module_api_request(monkeypatch, module_data):
+    def mock_module_get(url, params=None):
+        if params:
+            module_id = params["module_id"]
+            return next(module for module in module_data if module["id"] == module_id)
+        return None
+
+    # monkeypatch the cached and noncached requests
+    monkeypatch.setattr("ex56.videos.get_uncached_response", mock_module_get)
+    monkeypatch.setattr("ex56.videos.get_cached_response", mock_module_get)

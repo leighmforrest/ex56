@@ -78,3 +78,19 @@ def get_courses(target_dir, filename="courses.csv", cached=True):
 
     # return module ids
     return module_ids
+
+
+def get_modules(module_ids,  target_dir, filename="modules.csv", cached=True):
+    """Write a csv of module data and return a list of lesson ids."""
+    target_path = target_dir / filename
+    fields = ["id", "title", "description", "lessons"]
+    api_request_func = get_api_request_func(cached)
+    
+    modules_url = f"{BASE_URL}/module"
+    
+    modules = filter_data(module_ids, api_request_func, modules_url, fields, "module_id")
+    lesson_ids = get_ids(modules, "lessons")
+
+    write_csv(modules, target_path)
+
+    return lesson_ids
