@@ -1,7 +1,11 @@
+import os
 from bs4 import BeautifulSoup
 
 # Lambda for creating a soup, given a markup string.
 get_soup = lambda markup: BeautifulSoup(markup, features="html.parser")
+
+# Lambda for getting the filename out of the url
+get_filename = lambda url: os.path.basename(url)
 
 
 def get_files_from_links(soup, file_extension="pdf"):

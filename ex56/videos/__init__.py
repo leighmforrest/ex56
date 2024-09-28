@@ -27,14 +27,15 @@ def write_csv(data, target_path):
             writer.writerow(data_row)
 
 
-def filter_data(data_ids, api_request_func, data_url, fields, id_field_name):
+def filter_data(data_ids, api_request_func, data_url, fields, id_param_name):
         """Return filtered array of dictionaries, given a list of 
             ids, a request api function, a string of the id parameter name, and a list of needed fields.
         """
+
         data_list = []
 
         for data_id in data_ids:
-            params = {id_field_name: data_id, "full": True}
+            params = {id_param_name: data_id, "full": True}
             data = api_request_func(data_url, params)
 
             # filter to needed fields
@@ -58,6 +59,7 @@ def get_ids(data_items, related_id_field, id_field = "id"):
 
 def get_courses(target_dir, filename="courses.csv", cached=True):
     """Write a csv of course data and return a list of all module ids."""
+
     target_path = Path(target_dir / filename)
     fields = ["id", "title", "description", "modules"]
     api_request_func = get_api_request_func(cached)
@@ -82,8 +84,9 @@ def get_courses(target_dir, filename="courses.csv", cached=True):
 
 def get_modules(module_ids,  target_dir, filename="modules.csv", cached=True):
     """Write a csv of module data and return a list of lesson ids."""
+
     target_path = target_dir / filename
-    fields = ["id", "title", "description", "lessons"]
+    fields = ["id", "title", "description", "lessons", "product_id"]
     api_request_func = get_api_request_func(cached)
     
     modules_url = f"{BASE_URL}/module"
@@ -94,3 +97,23 @@ def get_modules(module_ids,  target_dir, filename="modules.csv", cached=True):
     write_csv(modules, target_path)
 
     return lesson_ids
+
+
+def get_lessons(lesson_ids,  target_dir, filename="lessons.csv", cached=True):
+    """Write a csv of lesson data, including total video duration time."""
+
+    target_path = target_dir / filename
+    lessons_url = f"{BASE_URL}/lesson"
+    fields = ["id", "title", "description", "media", "module_id"]
+    api_request_func = get_api_request_func(cached)
+
+    lessons = filter_data(lesson_ids, api_request_func, lessons_url, fields, "lesson_id")
+    
+    # Reduce the media to running time float
+    for lesson in lessons:
+        total_duration = sum(item['duration'] for item in lesson['media'])
+        del lesson["media"]
+
+        lesson["duration"] = total_duration
+    
+    write_csv(lessons, target_path)

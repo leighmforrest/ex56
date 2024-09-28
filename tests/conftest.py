@@ -3,6 +3,7 @@ import tempfile
 from pathlib import Path
 import os
 from .helpers import MockResponse, MockDownloadResponse
+from .test_data import API_DATA
 
 
 @pytest.fixture
@@ -46,64 +47,22 @@ def mock_request_get(monkeypatch):
 # Fixtures for use for testing the videos module
 @pytest.fixture
 def courses():
-    return [
-        {"id": 1, "title": "course 1", "green": "blue"},
-        {"id": 2, "title": "course 2", "green": "red"},
-    ]
+    return API_DATA["courses"]
 
 
 @pytest.fixture
 def course_data():
-    return [
-        {
-            "id": 1,
-            "title": "course 1",
-            "description": "Description for course 1",
-            "green": "blue",
-            "modules": [{"id": 101}, {"id": 102}],
-        },
-        {
-            "id": 2,
-            "title": "course 2",
-            "description": "Description for course 2",
-            "green": "blue",
-            "modules": [{"id": 201}, {"id": 202}],
-        },
-    ]
+    return API_DATA["course"]
 
 
 @pytest.fixture
 def module_data():
-    return [
-        {
-            "id": 101,
-            "title": "Module 101",
-            "description": "Description for Module 101",
-            "green": "blue",
-            "lessons": [{"id": 1101}, {"id": 1102}],
-        },
-        {
-            "id": 102,
-            "title": "Module 102",
-            "description": "Description for Module 102",
-            "green": "blue",
-            "lessons": [{"id": 2201}, {"id": 2202}],
-        },
-        {
-            "id": 201,
-            "title": "Module 201",
-            "description": "Description for Module 201",
-            "green": "blue",
-            "lessons": [{"id": 3201}, {"id": 3202}],
-        },
-        {
-            "id": 202,
-            "title": "Module 202",
-            "description": "Description for Module 202",
-            "green": "blue",
-            "lessons": [{"id": 4201}, {"id": 4202}],
-        },
-    ]
+    return API_DATA["module"]
+
+
+@pytest.fixture
+def lesson_data():
+    return API_DATA["lesson"]
 
 
 @pytest.fixture
@@ -130,3 +89,16 @@ def mock_module_api_request(monkeypatch, module_data):
     # monkeypatch the cached and noncached requests
     monkeypatch.setattr("ex56.videos.get_uncached_response", mock_module_get)
     monkeypatch.setattr("ex56.videos.get_cached_response", mock_module_get)
+
+
+@pytest.fixture
+def mock_lesson_api_request(monkeypatch, lesson_data):
+    def mock_lesson_get(url, params=None):
+        if params:
+            lesson_id = params["lesson_id"]
+            return next(lesson for lesson in lesson_data if lesson["id"] == lesson_id)
+        return None
+
+    # monkeypatch the cached and noncached requests
+    monkeypatch.setattr("ex56.videos.get_uncached_response", mock_lesson_get)
+    monkeypatch.setattr("ex56.videos.get_cached_response", mock_lesson_get)

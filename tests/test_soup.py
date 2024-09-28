@@ -1,7 +1,8 @@
 import pytest
-from ex56.soup import get_soup, get_files_from_links
+from ex56.soup import get_soup, get_files_from_links, get_filename
 
 BASE_MARKUP = "<html>{}</html>"
+
 LINKS = [
     "https://learncodethehardway.com/setup/python/ttb/pdfs/Statistical_Report_Beer_November_2021.pdf",
     "/setup/python/ttb/pdfs/Statistical_Report_Beer_November_2021.pdf",
@@ -9,6 +10,15 @@ LINKS = [
     "/setup/python/ttb/pdfs/Statistical_Report_Beer_October_2021.pdf",
     "http://google.com/data.doc",
     "http://www.example.com/data.txt",
+]
+
+FILES = [
+    "Statistical_Report_Beer_November_2021.pdf",
+    "Statistical_Report_Beer_November_2021.pdf",
+    "Statistical_Report_Beer_October_2021.pdf",
+    "Statistical_Report_Beer_October_2021.pdf",
+    "data.doc",
+    "data.txt",
 ]
 
 LINK_MARKUP = "".join([f'<a href="{link}">Link</a>' for link in LINKS])
@@ -41,3 +51,8 @@ def test_get_non_pdfs_from_links(extension, n):
     soup = get_soup(markup)
     files = get_files_from_links(soup, extension)
     assert len(files) == n
+
+
+@pytest.mark.parametrize("url,filename", zip(LINKS, FILES))
+def test_get_filename(url, filename):
+    assert get_filename(url) == filename
