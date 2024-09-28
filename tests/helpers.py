@@ -1,10 +1,5 @@
 import json
-from ex56.request import (
-    get_full_url,
-    cache_key,
-    get_cached_response,
-    download_file_with_cache,
-)
+import csv
 
 
 class MockResponse(object):
@@ -46,3 +41,14 @@ class MockDownloadResponse(object):
 
     def raise_for_status(self):
         pass
+
+
+def assert_csv_data(csv_file, expected_data):
+    """Helper to assert that  csv file existence and file matches data."""
+
+    with csv_file.open() as file:
+        reader = csv.DictReader(file)
+        rows = list(reader)
+
+    assert csv_file.exists(), "csv does not exist in the target directory."
+    assert rows == expected_data, "expected data does not match rows."
