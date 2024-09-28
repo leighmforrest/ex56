@@ -1,0 +1,30 @@
+id,title,description,product_id
+8,First Steps,Installing required software and advice for beginners.,1
+9,JavaScript Level 1,Introduction to all of the basic elements of JavaScript.,1
+10,JavaScript Level 2,A set of 10 small projects that refine and practice your JavaScript skills.,1
+58,CSS Basics,Learn a simple way to use CSS to style HTML.,1
+60,HTML Basics,Learn how browsers structure the content you see using HTML tags.,1
+4,Getting Started in Python,The best course to learn Python.,3
+5,The Basics of Programming,Learning the basic programming concepts.,3
+6,Applying What You Know,Getting started in semi-advanced topics,3
+7,Python and Data Science,Learning the early tools a data scientist will use in their work.,3
+651,Learn C the Hard Way,An introductory course in the C programming language.,168
+660,Learn SQL the Hard Way,An introductory course in the SQL programming data language.,173
+847,Initial Knowledge,I start you off with some basic concepts that will help you later in the course.,244
+848,Quick Hacks,Warm up with a series of simple tools to implement as quick hacks.,244
+849,Data Structures,Learn a few basic data structures and how to measure their performance using measurement.,244
+850,Intermediate Projects,Take what you know so far and attempt some more challenging projects.,244
+851,Parsing Text,The most universal programming skill you can learn is parsing.,244
+852,SQL and Object Relational Mapping,You now learn enough SQL to be dangerous and then learn to use it better in Python.,244
+853,Final Projects,The final projects of the course presented as challenges.,244
+2028,Learn JavaScript the Hard Way Support,Additional help and instructions for Learn JavaScript the Hard Way buyers.,266
+2029,Learn Python the Hard Way Support,Additional help and instructions for Learn Python the Hard Way buyers.,266
+2855,Basics of Drawing,"Learning to draw will make learning to paint easier, it's also a really great experience on its own.",342
+2523,Linux Basics,"The basics of installing, configuring, and managing a small Linux server.",442
+2810,Configuring and Managing Services,Covers the configuration and management of many popular services.,442
+2811,Linux Security Basics,"Security basics for Linux, featuring the effective security that gets you most protection you need.",442
+4447,The Basics,You'll setup your computer for programming and learn the very basics of programming with C++.,1139
+4448,Beginner C++,With the basics of simple programming concepts learned you are now ready to learn beginner C++.,1139
+4449,Intermediate C++,You know enough C++ to now start applying what you know to more advanced topics.,1139
+4450,Your First Terrible Game,Now you'll setup to make one small terrible game in C++.,1139
+5655,Crash Course in Regex,This module takes you from nothing to be able to use Regular Expressions (regex) for simple search and replace operations.,1625
