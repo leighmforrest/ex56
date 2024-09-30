@@ -7,7 +7,12 @@ from .helpers import MockResponse, MockDownloadResponse
 from .test_data import API_DATA
 
 
-BASE_TEST_DATA = BASE_DIR / ".." / "tests" / "data" 
+BASE_TEST_DATA_DIR = BASE_DIR / ".." / "tests" / "data" 
+
+
+@pytest.fixture
+def test_data_path():
+    return BASE_TEST_DATA_DIR
 
 
 @pytest.fixture
@@ -112,8 +117,8 @@ def mock_lesson_api_request(monkeypatch, lesson_data):
 #   Fixtures for ttb tests
 #
 @pytest.fixture
-def markup():
-    markup_file = BASE_TEST_DATA / "test.html"
+def markup(test_data_path):
+    markup_file = test_data_path / "test.html"
     with open(markup_file, "r") as file:
         markup_string = file.read()
     
@@ -131,8 +136,8 @@ def mock_markup_request(monkeypatch, markup):
 
 
 @pytest.fixture
-def test_excel_spreadsheet():
-    spreadsheet_path = BASE_TEST_DATA / "Statistical_Report_Beer_October_2021.xlsx"
+def test_excel_spreadsheet(test_data_path):
+    spreadsheet_path = test_data_path / "Statistical_Report_Beer_October_2021.xlsx"
 
     with open(spreadsheet_path, "rb") as file:
         file_bytes = file.read()
@@ -145,7 +150,7 @@ def mock_spreadsheet_download(monkeypatch, test_excel_spreadsheet):
     def mock_response(full_url, file_path, **kwargs):
         with open(file_path, "wb") as file:
             file.write(test_excel_spreadsheet)
-        return file_path
+        return str(file_path)
     
     monkeypatch.setattr("ex56.helpers.download_file_with_cache",  mock_response)
     monkeypatch.setattr("ex56.helpers.download_file_without_cache",  mock_response)
