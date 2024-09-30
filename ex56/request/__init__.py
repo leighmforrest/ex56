@@ -127,15 +127,7 @@ def download_file_with_cache(url, file_path, params=None, **kwargs):
                     "Warning: Cached data is not valid JSON, proceeding to download the file."
                 )
 
-        # Download the file if not cached or modified
-        print("Downloading file.")
-        response = requests.get(full_url, stream=True, **kwargs)
-        response.raise_for_status()
-
-        # Write the response content to a file
-        with open(file_path, "wb") as file:
-            for chunk in response.iter_content(chunk_size=10 * 1024):
-                file.write(chunk)
+        response = direct_download(full_url, file_path, **kwargs)
 
         # Update the cache with the new file info
         cache[url_hash] = json.dumps(
@@ -144,3 +136,23 @@ def download_file_with_cache(url, file_path, params=None, **kwargs):
 
         print("File downloaded and cached.")
         return str(file_path)
+
+
+def download_file_without_cache(full_url, file_path, params=None, **kwargs):
+    direct_download(full_url, file_path, params=params, **kwargs)
+    
+    return str(file_path)
+
+
+def direct_download(full_url, file_path, **kwargs):
+        """Download a file directly. Return a response for obtaining ETag."""
+        print("Downloading file.")
+        response = requests.get(full_url, stream=True, **kwargs)
+        response.raise_for_status()
+
+        # Write the response content to a file
+        with open(file_path, "wb") as file:
+            for chunk in response.iter_content(chunk_size=10 * 1024):
+                file.write(chunk)
+        
+        return response

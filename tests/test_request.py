@@ -6,6 +6,7 @@ from ex56.request import (
     get_full_url,
     cache_key,
     download_file_with_cache,
+    download_file_without_cache,
     get_uncached_response,
 )
 
@@ -259,3 +260,20 @@ def test_cached_response_download_invalid_json(monkeypatch, capfd, temp_file, mo
         "Warning: Cached data is not valid JSON, proceeding to download the file."
         in captured.out
     )
+
+
+def test_download_without_cache(monkeypatch, temp_file):
+    params = {"id": 1}
+    url = "http://www.example.com/example.txt"
+    full_url = get_full_url(url, params)
+
+    # First download to simulate caching
+    mock_response = MockDownloadResponse(
+        content=b"ItemOne,ItemTwo", status_code=200
+    )
+    monkeypatch.setattr("requests.get", lambda *args, **kwargs: mock_response)
+
+    file_path = download_file_without_cache(url, temp_file, params)
+
+    with open(file_path, "rb") as f:
+        assert f.read() == b"ItemOne,ItemTwo"

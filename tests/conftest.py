@@ -2,8 +2,12 @@ import pytest
 import tempfile
 from pathlib import Path
 import os
+from ex56.constants import BASE_DIR
 from .helpers import MockResponse, MockDownloadResponse
 from .test_data import API_DATA
+
+
+BASE_TEST_DATA = BASE_DIR / ".." / "tests" / "data" 
 
 
 @pytest.fixture
@@ -74,8 +78,8 @@ def mock_course_api_request(monkeypatch, course_data, courses):
         return courses
 
     # monkeypatch the cached and noncached requests
-    monkeypatch.setattr("ex56.videos.get_uncached_response", mock_course_get)
-    monkeypatch.setattr("ex56.videos.get_cached_response", mock_course_get)
+    monkeypatch.setattr("ex56.helpers.get_uncached_response", mock_course_get)
+    monkeypatch.setattr("ex56.helpers.get_cached_response", mock_course_get)
 
 
 @pytest.fixture
@@ -87,8 +91,8 @@ def mock_module_api_request(monkeypatch, module_data):
         return None
 
     # monkeypatch the cached and noncached requests
-    monkeypatch.setattr("ex56.videos.get_uncached_response", mock_module_get)
-    monkeypatch.setattr("ex56.videos.get_cached_response", mock_module_get)
+    monkeypatch.setattr("ex56.helpers.get_uncached_response", mock_module_get)
+    monkeypatch.setattr("ex56.helpers.get_cached_response", mock_module_get)
 
 
 @pytest.fixture
@@ -100,5 +104,48 @@ def mock_lesson_api_request(monkeypatch, lesson_data):
         return None
 
     # monkeypatch the cached and noncached requests
-    monkeypatch.setattr("ex56.videos.get_uncached_response", mock_lesson_get)
-    monkeypatch.setattr("ex56.videos.get_cached_response", mock_lesson_get)
+    monkeypatch.setattr("ex56.helpers.get_uncached_response", mock_lesson_get)
+    monkeypatch.setattr("ex56.helpers.get_cached_response", mock_lesson_get)
+
+
+#
+#   Fixtures for ttb tests
+#
+@pytest.fixture
+def markup():
+    markup_file = BASE_TEST_DATA / "test.html"
+    with open(markup_file, "r") as file:
+        markup_string = file.read()
+    
+    return markup_string
+
+
+@pytest.fixture
+def mock_markup_request(monkeypatch, markup):
+    def mock_markup_get(url, response_type=None):
+        return markup
+
+    # monkeypatch the cached and noncached requests
+    monkeypatch.setattr("ex56.ttb.get_uncached_response", mock_markup_get)
+    monkeypatch.setattr("ex56.ttb.get_cached_response", mock_markup_get)
+
+
+@pytest.fixture
+def test_excel_spreadsheet():
+    spreadsheet_path = BASE_TEST_DATA / "Statistical_Report_Beer_October_2021.xlsx"
+
+    with open(spreadsheet_path, "rb") as file:
+        file_bytes = file.read()
+    
+    return file_bytes
+
+
+@pytest.fixture
+def mock_spreadsheet_download(monkeypatch, test_excel_spreadsheet):
+    def mock_response(full_url, file_path, **kwargs):
+        with open(file_path, "wb") as file:
+            file.write(test_excel_spreadsheet)
+        return file_path
+    
+    monkeypatch.setattr("ex56.helpers.download_file_with_cache",  mock_response)
+    monkeypatch.setattr("ex56.helpers.download_file_without_cache",  mock_response)

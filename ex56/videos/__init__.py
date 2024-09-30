@@ -1,16 +1,8 @@
 from pprint import pprint
 import csv
 from pathlib import Path
-from ex56.request import get_cached_response, get_uncached_response
-from ex56.constants import BASE_URL
-
-
-def get_api_request_func(cached=True):
-    """Get an api request function based on whether the request is cached or not."""
-    if cached:
-        return get_cached_response
-    else:
-        return get_uncached_response
+from ex56.helpers import get_api_request_func
+from ex56.constants import API_URL
 
 
 def write_csv(data, target_path):
@@ -47,6 +39,7 @@ def filter_data(data_ids, api_request_func, data_url, fields, id_param_name):
 
 
 def get_ids(data_items, related_id_field, id_field = "id"):
+    """Get id field from a list of data items."""
     data_ids = []
 
     for data_item in data_items:
@@ -64,7 +57,7 @@ def get_courses(target_dir, filename="courses.csv", cached=True):
     api_request_func = get_api_request_func(cached)
 
     # create an array of course ids
-    courses_url = f"{BASE_URL}/api/course"
+    courses_url = f"{API_URL}/course"
     initial_courses = api_request_func(courses_url)
     course_ids = [course["id"] for course in initial_courses]
 
@@ -88,7 +81,7 @@ def get_modules(module_ids,  target_dir, filename="modules.csv", cached=True):
     fields = ["id", "title", "description", "lessons", "product_id"]
     api_request_func = get_api_request_func(cached)
     
-    modules_url = f"{BASE_URL}/api/module"
+    modules_url = f"{API_URL}/module"
     
     modules = filter_data(module_ids, api_request_func, modules_url, fields, "module_id")
     lesson_ids = get_ids(modules, "lessons")
@@ -102,7 +95,7 @@ def get_lessons(lesson_ids,  target_dir, filename="lessons.csv", cached=True):
     """Write a csv of lesson data, including total video duration time."""
 
     target_path = target_dir / filename
-    lessons_url = f"{BASE_URL}/api/lesson"
+    lessons_url = f"{API_URL}/lesson"
     fields = ["id", "title", "description", "media", "module_id"]
     api_request_func = get_api_request_func(cached)
 
