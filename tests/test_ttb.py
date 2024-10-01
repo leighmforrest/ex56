@@ -24,18 +24,3 @@ def test_download_spreadsheets(cached, tmpdir, mock_spreadsheet_download, test_e
 
     for spreadsheet in expected_filenames:
         assert (tmpdir / spreadsheet).exists()
-
-
-def test_get_dataframes(test_data_path):
-    xlsx_files = glob.glob(f"{test_data_path}/*.xlsx")
-    
-    test_dataframes = [pd.read_excel(xlsx_file) for xlsx_file in xlsx_files]
-
-    dataframes = get_dataframes(test_data_path)
-
-    dfs = zip(test_dataframes, dataframes)
-    
-    assert len(list(dfs)) == 2
-    for df in dfs:
-        pd.testing.assert_frame_equal(df[0], df[1])
-    

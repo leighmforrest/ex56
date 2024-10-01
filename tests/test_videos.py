@@ -1,6 +1,7 @@
 import pytest
-import csv
-from ex56.videos import get_courses, get_modules, get_lessons
+import glob
+import pandas as pd
+from ex56.videos import get_courses, get_modules, get_lessons, get_dataframes
 from tests.test_data import EXPECTED_IDS, EXPECTED_CSV_DATA
 from tests.helpers import assert_csv_data
 
@@ -60,3 +61,5 @@ def test_get_lessons_csv_file_created(tmp_path, mock_lesson_api_request, lesson_
         target_dir,
     )
     assert_csv_data(csv_file, expected_data)
+
+    
