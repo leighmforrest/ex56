@@ -1,7 +1,5 @@
 import pytest
-import glob
-import pandas as pd
-from ex56.ttb import get_ttb_markup, get_xlsx_links, download_spreadshets, get_filename, get_dataframes
+from ex56.ttb import get_ttb_markup, get_xlsx_links, download_spreadshets, get_filename
 
 
 @pytest.mark.parametrize("cached", [True, False])

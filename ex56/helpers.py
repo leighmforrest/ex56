@@ -32,7 +32,7 @@ def get_pandas_reader(file_extension):
     elif file_extension == "xlsx":
         reader = pd.read_excel
     else:
-        raise ValueError("Extension is not compatible.")
+        raise ValueError(f"Extension {file_extension} is not compatible.")
     
     return reader
 
@@ -42,16 +42,13 @@ def get_dataframes(target_dir, file_extension="csv"):
     try:
         reader = get_pandas_reader(file_extension)
 
-        if reader is None:
-            raise ValueError(f"Unsupported file extension: {file_extension}")
-
         # get all the files with the extension in directory
         data_files = [str(Path(file).resolve()) for file in glob.glob(f"{target_dir}/*.{file_extension}")]
 
         dataframes = [reader(data_file) for data_file in data_files]
 
         return dataframes
-    except:
-        print("ERROR")
+    except ValueError as e:
+        print(f"ValueError: {e}")
         return []
     

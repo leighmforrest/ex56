@@ -3,8 +3,9 @@ from pathlib import Path
 
 import pandas as pd
 
-from videos import get_courses, get_modules, get_lessons
-from ex56.ttb import get_xlsx_links, download_spreadshets, get_dataframes
+from ex56.videos import get_courses, get_modules, get_lessons
+from ex56.ttb import get_xlsx_links, download_spreadshets
+from ex56.helpers import get_dataframes
 from constants import BASE_DIR, BASE_URL, DOWNLOAD_DIR
 
 CHOICES = {
@@ -69,9 +70,10 @@ if __name__ == "__main__":
         print("TTB REPORTING")
         links = get_xlsx_links(cached)
         download_spreadshets(links, DOWNLOAD_DIR, cached)
-        dataframes = get_dataframes(DOWNLOAD_DIR)
+        dataframes = get_dataframes(DOWNLOAD_DIR, "xlsx")
 
         for df in dataframes:
-            print(df.iloc[3:5,0])
+            df_dates = df.iloc[3:5,0]
+
     if videos:
         print("VIDEO REPORTING")

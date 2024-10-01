@@ -32,14 +32,3 @@ def download_spreadshets(links, target_dir, cached=True):
         filename = get_filename(link)
         download_function(link, target_dir / filename)
         print(f"{filename} downloaded into {target_dir}")
-
-
-def get_dataframes(target_dir):
-    """Turn all xlxs files into dataframes"""
-
-    # get all the .xlsx files in directory
-    xlsx_files = glob.glob(f"{target_dir}/*.xlsx")
-
-    dataframes = [pd.read_excel(xlsx_file) for xlsx_file in xlsx_files]
-
-    return dataframes

@@ -24,10 +24,9 @@ def test_get_dataframes(test_data_path, extension, expected):
 
 
 def test_get_dataframes_ineligible_extension(capsys, test_data_path):
+
+    dfs = get_dataframes(test_data_path, "txt")
     captured = capsys.readouterr()
 
-    with pytest.raises(ValueError):
-        reader = get_pandas_reader("txt")
-
-        assert reader is None
-        assert "ValueError" in captured.out
+    assert dfs == []
+    assert f"Extension txt is not compatible." in captured.out

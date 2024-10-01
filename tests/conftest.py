@@ -3,7 +3,7 @@ import tempfile
 from pathlib import Path
 import os
 from ex56.constants import BASE_DIR
-from .helpers import MockResponse, MockDownloadResponse
+from .helpers import MockDownloadResponse
 from .test_data import API_DATA
 
 

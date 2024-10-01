@@ -3,7 +3,7 @@ import csv
 import glob
 from pathlib import Path
 import pandas as pd
-from ex56.helpers import get_api_request_func
+from ex56.helpers import get_api_request_func, get_dataframes
 from ex56.constants import API_URL
 
 
@@ -111,14 +111,3 @@ def get_lessons(lesson_ids,  target_dir, filename="lessons.csv", cached=True):
         lesson["duration"] = total_duration
     
     write_csv(lessons, target_path)
-
-
-def get_dataframes(target_dir):
-    """Turn all csv files into dataframes"""
-
-    # get all the .csv files in directory
-    csv_files = glob.glob(f"{target_dir}/*.csv")
-
-    dataframes = [pd.read_csv(csv_file) for csv_file in csv_files]
-
-    return dataframes
