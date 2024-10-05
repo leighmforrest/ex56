@@ -36,6 +36,22 @@ def get_uncached_response(url, params=None, headers={}, response_type="json"):
     return response_data
 
 
+def get_cached_data(cache_db, hashed_key):
+    """Get etag and body data out of cache"""
+    cached_data = json.loads(cache_db[hashed_key])  # Convert to Python dict
+    cached_etag = cached_data.get("etag")
+    cached_body = cached_data.get("body")
+
+    return cached_etag, cached_body
+
+
+# def convert_cached_data(cached_body, response_type="json"):
+#     """Convert cached data to dict if ."""
+#     if isinstance() and response_type == "json":
+#         return json.loads(cached_body)
+#     else:
+#         return cached_body
+
 def get_cached_response(url, params=None, headers={}, response_type="json"):
     """
     Fetches a cached response with ETag support.
@@ -45,12 +61,9 @@ def get_cached_response(url, params=None, headers={}, response_type="json"):
 
     # Open a dbm database for caching
     with dbm.open("cache", "c") as cache_db:
-
-        # Check if the URL's response and ETag are already cached
         if hashed_key in cache_db:
-            cached_data = json.loads(cache_db[hashed_key])  # Convert to Python dict
-            cached_etag = cached_data.get("etag")
-            cached_body = cached_data.get("body")
+            # Check if the URL's response and ETag are already cached
+            cached_etag, cached_body = get_cached_data(cache_db, hashed_key)
 
             # Send a request with the cached ETag
             headers = headers if isinstance(headers, dict) else {}
@@ -59,10 +72,7 @@ def get_cached_response(url, params=None, headers={}, response_type="json"):
 
             if response.status_code == 304:
                 print(f"Cache hit: {full_url} not modified, using cached data")
-                if isinstance(cached_body, str) and response_type == "json":
-                    return json.loads(cached_body)
-                else:
-                    return cached_body
+                return cached_body
 
             print(f"Cache miss: Resource modified, fetching new data from {full_url}")
             # Update the cache with the new ETag and response body
