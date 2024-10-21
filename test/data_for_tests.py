@@ -32,3 +32,27 @@ FILES = [
 ]
 
 LINK_MARKUP = "".join([f'<a href="{link}">Link</a>' for link in LINKS])
+
+# VIDEOS TEST DATA
+API_DATA = {
+    "courses": [
+        {"id": 1, "title": "course 1", "green": "blue"},
+        {"id": 2, "title": "course 2", "green": "red"},
+    ],
+    "course": [
+        {
+            "id": 1,
+            "title": "course 1",
+            "description": "Description for course 1",
+            "green": "blue",
+            "modules": [{"id": 101}, {"id": 102}],
+        },
+        {
+            "id": 2,
+            "title": "course 2",
+            "description": "Description for course 2",
+            "green": "blue",
+            "modules": [{"id": 201}, {"id": 202}],
+        },
+    ],
+}

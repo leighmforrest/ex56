@@ -1,4 +1,5 @@
-from request import get_with_cache
+from ex_56.videos import get_courses
 
 if __name__ == "__main__":
-    get_with_cache("http://www.google.com")
+    x = get_courses()
+    print(x)

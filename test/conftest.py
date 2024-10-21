@@ -1,5 +1,6 @@
+import json
 from pathlib import Path
-from test.data_for_tests import BASE_MARKUP, LINK_MARKUP
+from test.data_for_tests import API_DATA, BASE_MARKUP, LINK_MARKUP
 from test.mocks import MockDownloadResponse
 
 import pytest
@@ -19,7 +20,7 @@ def mock_dbm(monkeypatch):
 
     class MockDBM:
         def __init__(self):
-            self.store = {}
+            pass
 
         def __enter__(self):
             return mock_db
@@ -60,3 +61,27 @@ def mock_download_200(monkeypatch):
 @pytest.fixture
 def link_soup():
     return get_soup(BASE_MARKUP.format(LINK_MARKUP))
+
+
+@pytest.fixture
+def courses_data():
+    return API_DATA["courses"]
+
+
+@pytest.fixture
+def course_data():
+    return API_DATA["course"]
+
+
+@pytest.fixture
+def mock_course_api_request(monkeypatch, courses_data, course_data):
+    def mock_course_get(url, params=None):
+        if params:
+            course_id = params["course_id"]
+            return json.dumps(
+                next(course for course in course_data if course["id"] == course_id)
+            )
+        return json.dumps(courses_data)
+
+    monkeypatch.setattr("ex_56.videos.get_with_cache", mock_course_get)
+    monkeypatch.setattr("ex_56.videos.get_without_cache", mock_course_get)
