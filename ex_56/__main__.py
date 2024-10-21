@@ -1,2 +1,3 @@
+from request import get_with_cache
 if __name__ == '__main__':
-    print("Hello World!")
+    get_with_cache("http://www.google.com")
