@@ -1,7 +1,10 @@
 from pathlib import Path
+from test.data_for_tests import BASE_MARKUP, LINK_MARKUP
 from test.mocks import MockDownloadResponse
 
 import pytest
+
+from ex_56.soup import get_soup
 
 
 @pytest.fixture
@@ -52,3 +55,8 @@ def mock_download_200(monkeypatch):
         content=b"ItemOne,ItemTwo", status_code=200, headers={"etag": "SomeEtag"}
     )
     monkeypatch.setattr("requests.get", lambda *arg, **kwargs: mock_response)
+
+
+@pytest.fixture
+def link_soup():
+    return get_soup(BASE_MARKUP.format(LINK_MARKUP))
