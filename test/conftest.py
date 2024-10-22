@@ -1,8 +1,14 @@
 import json
 from pathlib import Path
-from test.data_for_tests import API_DATA, BASE_MARKUP, LINK_MARKUP
+from test.data_for_tests import (
+    API_DATA,
+    BASE_MARKUP,
+    LINK_MARKUP,
+    VIDEOS_EXPECTED_DATAFRAME_DATA,
+)
 from test.mocks import MockDownloadResponse
 
+import pandas as pd
 import pytest
 
 from ex_56.soup import get_soup
@@ -63,6 +69,9 @@ def link_soup():
     return get_soup(BASE_MARKUP.format(LINK_MARKUP))
 
 
+#
+#   Videos Fixtures
+#
 @pytest.fixture
 def courses_data():
     return API_DATA["courses"]
@@ -71,6 +80,16 @@ def courses_data():
 @pytest.fixture
 def course_data():
     return API_DATA["course"]
+
+
+@pytest.fixture
+def module_data():
+    return API_DATA["module"]
+
+
+@pytest.fixture
+def lesson_data():
+    return API_DATA["lesson"]
 
 
 @pytest.fixture
@@ -85,3 +104,41 @@ def mock_course_api_request(monkeypatch, courses_data, course_data):
 
     monkeypatch.setattr("ex_56.videos.get_with_cache", mock_course_get)
     monkeypatch.setattr("ex_56.videos.get_without_cache", mock_course_get)
+
+
+@pytest.fixture
+def mock_module_api_request(monkeypatch, module_data):
+    def mock_module_get(url, params=None):
+        if params:
+            module_id = params["module_id"]
+            return json.dumps(
+                next(module for module in module_data if module["id"] == module_id)
+            )
+        return None
+
+    monkeypatch.setattr("ex_56.videos.get_with_cache", mock_module_get)
+    monkeypatch.setattr("ex_56.videos.get_without_cache", mock_module_get)
+
+
+@pytest.fixture
+def mock_lesson_api_request(monkeypatch, lesson_data):
+    def mock_lesson_get(url, params=None):
+        if params:
+            lesson_id = params["lesson_id"]
+            return json.dumps(
+                next(lesson for lesson in lesson_data if lesson["id"] == lesson_id)
+            )
+        return None
+
+    monkeypatch.setattr("ex_56.videos.get_with_cache", mock_lesson_get)
+    monkeypatch.setattr("ex_56.videos.get_without_cache", mock_lesson_get)
+
+
+@pytest.fixture
+def courses_dataframe():
+    return pd.DataFrame(VIDEOS_EXPECTED_DATAFRAME_DATA["courses"])
+
+
+@pytest.fixture
+def modules_dataframe():
+    return pd.DataFrame(VIDEOS_EXPECTED_DATAFRAME_DATA["modules"])
