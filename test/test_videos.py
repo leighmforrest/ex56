@@ -12,6 +12,9 @@ from ex_56.videos import (
     get_lesson,
     get_module,
     get_module_dataframe,
+    get_lesson_dataframe,
+    process_modules_dataframe,
+    process_courses_dataframe,
 )
 
 
@@ -60,3 +63,24 @@ def test_get_modules_dataframe(mock_module_api_request, cached, modules_datafram
     df, lesson_ids = get_module_dataframe(module_ids, cached)
     pd.testing.assert_frame_equal(df, modules_dataframe)
     assert expected_lesson_ids == lesson_ids
+
+
+@pytest.mark.parametrize("cached", [True, False])
+def test_get_lesson_dataframe(mock_lesson_api_request, cached, lesson_dataframe):
+    lesson_ids = EXPECTED_IDS["lessons"]
+
+    df = get_lesson_dataframe(lesson_ids, cached)
+    pd.testing.assert_frame_equal(df, lesson_dataframe)
+
+
+def test_process_modules_dataframe(
+    lesson_dataframe, modules_dataframe, final_modules_dataframe
+):
+    result = process_modules_dataframe(lesson_dataframe, modules_dataframe)
+
+    pd.testing.assert_frame_equal(result, final_modules_dataframe)
+
+
+def test_process_courses_dataframe(final_courses_dataframe, courses_dataframe):
+    result = process_courses_dataframe(final_courses_dataframe, courses_dataframe)
+    pd.testing.assert_frame_equal(result, final_courses_dataframe)

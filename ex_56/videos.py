@@ -11,7 +11,7 @@ request_func = lambda cached=True: get_with_cache if cached else get_without_cac
 ALLOWED_KEYS = {
     "course": ["id", "title", "modules"],
     "module": ["id", "title", "lessons", "product_id"],
-    "lesson": ["id", "title", "media"],
+    "lesson": ["id", "module_id", "title", "media"],
 }
 
 
@@ -74,3 +74,67 @@ def get_module_dataframe(module_ids, cached=True):
 
     module_df = pd.DataFrame(modules)
     return (module_df, lesson_ids)
+
+
+def get_lesson_dataframe(lesson_ids, cached=True):
+    lessons = []
+
+    for lesson_id in lesson_ids:
+        lesson = get_lesson(lesson_id, cached)
+
+        # reduce the durations
+        total_duration = sum(item["duration"] for item in lesson["media"])
+        del lesson["media"]
+
+        lesson["duration"] = total_duration
+        lessons.append(lesson)
+
+    lesson_df = pd.DataFrame(lessons)
+    return lesson_df
+
+
+def process_modules_dataframe(lesson_df, module_df):
+    modules = pd.merge(
+        module_df,
+        lesson_df[["module_id", "duration"]],
+        how="left",
+        left_on="id",
+        right_on="module_id",
+    )
+
+    final_module_df = (
+        modules.groupby("module_id")
+        .agg(
+            {"id": "first", "title": "first", "product_id": "first", "duration": "sum"}
+        )
+        .reset_index(drop=True)
+    )
+
+    return final_module_df
+
+
+def process_courses_dataframe(module_df, course_df):
+    course_df["id"] = course_df["id"].astype(int)
+    module_df["product_id"] = module_df["product_id"].astype(int)
+
+    courses = pd.merge(
+        course_df,
+        module_df,
+        how="left",
+        left_on="id",
+        right_on="product_id",
+    )
+
+    final_courses_df = (
+        courses.groupby("product_id")
+        .agg(
+            {
+                "title_x": "first",
+                "duration": "sum",
+            }
+        )
+        .reset_index()
+        .rename(columns={"title_x": "title"})
+    )
+
+    return final_courses_df

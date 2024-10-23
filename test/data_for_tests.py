@@ -1,3 +1,6 @@
+import pandas as pd
+
+
 REQUEST_SET = [
     ("http://www.example.com", {"id": 1}, "etag1", '{"hello": "world"}'),
     ("http://www.goggles.com", {"course_id": 2}, "etag2", '{"id": 2}'),
@@ -182,56 +185,48 @@ VIDEOS_EXPECTED_DATAFRAME_DATA = {
             "id": 1101,
             "module_id": 101,
             "title": "Lesson 1101",
-            "description": "The lesson 1101",
             "duration": 200.02,
         },
         {
             "id": 1102,
             "module_id": 101,
             "title": "Lesson 1102",
-            "description": "The lesson 1102",
             "duration": 0,
         },
         {
             "id": 2201,
             "module_id": 102,
             "title": "Lesson 2201",
-            "description": "The lesson 2201",
             "duration": 0,
         },
         {
             "id": 2202,
             "module_id": 102,
             "title": "Lesson 2202",
-            "description": "The lesson 2202",
             "duration": 0,
         },
         {
             "id": 3201,
             "module_id": 201,
             "title": "Lesson 3201",
-            "description": "The lesson 3201",
             "duration": 100.01,
         },
         {
             "id": 3202,
             "module_id": 201,
             "title": "Lesson 3202",
-            "description": "The lesson 3202",
             "duration": 100.01,
         },
         {
             "id": 4201,
             "module_id": 202,
             "title": "Lesson 4201",
-            "description": "The lesson 4201",
             "duration": 1.0,
         },
         {
             "id": 4202,
             "module_id": 202,
             "title": "Lesson 4202",
-            "description": "The lesson 4202",
             "duration": 0,
         },
     ],
@@ -247,4 +242,18 @@ EXPECTED_IDS = {
         202,
     ],
     "lessons": [1101, 1102, 2201, 2202, 3201, 3202, 4201, 4202],
+}
+
+FINAL_EXPECTED_VIDEOS_DATAFRAMES = {
+    "modules": {
+        "id": {0: 101, 1: 102, 2: 201, 3: 202},
+        "title": {0: "Module 101", 1: "Module 102", 2: "Module 201", 3: "Module 202"},
+        "product_id": {0: 1, 1: 1, 2: 2, 3: 2},
+        "duration": {0: 200.02, 1: 0.0, 2: 200.02, 3: 1.0},
+    },
+    "courses": {
+        "product_id": {0: 1, 1: 2},
+        "title": {0: "course 1", 1: "course 2"},
+        "duration": {0: 200.02, 1: 201.02},
+    },
 }

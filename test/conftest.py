@@ -5,6 +5,7 @@ from test.data_for_tests import (
     BASE_MARKUP,
     LINK_MARKUP,
     VIDEOS_EXPECTED_DATAFRAME_DATA,
+    FINAL_EXPECTED_VIDEOS_DATAFRAMES,
 )
 from test.mocks import MockDownloadResponse
 
@@ -142,3 +143,18 @@ def courses_dataframe():
 @pytest.fixture
 def modules_dataframe():
     return pd.DataFrame(VIDEOS_EXPECTED_DATAFRAME_DATA["modules"])
+
+
+@pytest.fixture
+def lesson_dataframe():
+    return pd.DataFrame(VIDEOS_EXPECTED_DATAFRAME_DATA["lessons"])
+
+
+@pytest.fixture
+def final_modules_dataframe():
+    return pd.DataFrame(FINAL_EXPECTED_VIDEOS_DATAFRAMES["modules"])
+
+
+@pytest.fixture
+def final_courses_dataframe():
+    return pd.DataFrame(FINAL_EXPECTED_VIDEOS_DATAFRAMES["courses"])
