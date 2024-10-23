@@ -83,4 +83,5 @@ def test_process_modules_dataframe(
 
 def test_process_courses_dataframe(final_courses_dataframe, courses_dataframe):
     result = process_courses_dataframe(final_courses_dataframe, courses_dataframe)
+    
     pd.testing.assert_frame_equal(result, final_courses_dataframe)
