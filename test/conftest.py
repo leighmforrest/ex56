@@ -3,12 +3,12 @@ from pathlib import Path
 from test.data_for_tests import (
     API_DATA,
     BASE_MARKUP,
+    FINAL_EXPECTED_VIDEOS_DATAFRAMES,
     LINK_MARKUP,
     VIDEOS_EXPECTED_DATAFRAME_DATA,
-    FINAL_EXPECTED_VIDEOS_DATAFRAMES,
 )
-from test.mocks import MockDownloadResponse
 from test.helpers import download_spreadsheets_helper
+from test.mocks import MockDownloadResponse
 
 import pandas as pd
 import pytest
@@ -161,6 +161,7 @@ def final_modules_dataframe():
 def final_courses_dataframe():
     return pd.DataFrame(FINAL_EXPECTED_VIDEOS_DATAFRAMES["courses"])
 
+
 #
 #   TTB FIXTURES
 #
@@ -169,8 +170,9 @@ def markup():
     markup_file = Path(__file__).parent / "data_files/test.html"
     with open(markup_file, "r") as file:
         markup_text = file.read()
-    
+
     return markup_text
+
 
 @pytest.fixture
 def mock_markup_request(markup, monkeypatch):
@@ -212,4 +214,10 @@ def mock_spreadsheet_download(monkeypatch, test_excel_bytes):
 
 @pytest.fixture
 def test_download_spreadsheet(mock_spreadsheet_download, xlsx_links, tmpdir, cached):
-    download_spreadsheets_helper(mock_spreadsheet_download,xlsx_links,tmpdir, cached)
+    download_spreadsheets_helper(mock_spreadsheet_download, xlsx_links, tmpdir, cached)
+
+
+@pytest.fixture
+def test_ttb_dataframe():
+    spreadsheet_path = Path(__file__).parent / "data_files/test.xlsx"
+    return pd.read_excel(spreadsheet_path)

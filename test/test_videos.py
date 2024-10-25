@@ -10,11 +10,11 @@ from ex_56.videos import (
     get_course_dataframe,
     get_courses,
     get_lesson,
+    get_lesson_dataframe,
     get_module,
     get_module_dataframe,
-    get_lesson_dataframe,
-    process_modules_dataframe,
     process_courses_dataframe,
+    process_modules_dataframe,
 )
 
 
@@ -83,5 +83,5 @@ def test_process_modules_dataframe(
 
 def test_process_courses_dataframe(final_courses_dataframe, courses_dataframe):
     result = process_courses_dataframe(final_courses_dataframe, courses_dataframe)
-    
+
     pd.testing.assert_frame_equal(result, final_courses_dataframe)

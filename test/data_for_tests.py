@@ -1,6 +1,5 @@
 import pandas as pd
 
-
 REQUEST_SET = [
     ("http://www.example.com", {"id": 1}, "etag1", '{"hello": "world"}'),
     ("http://www.goggles.com", {"course_id": 2}, "etag2", '{"id": 2}'),
