@@ -8,11 +8,13 @@ from test.data_for_tests import (
     FINAL_EXPECTED_VIDEOS_DATAFRAMES,
 )
 from test.mocks import MockDownloadResponse
+from test.helpers import download_spreadsheets_helper
 
 import pandas as pd
 import pytest
 
 from ex_56.soup import get_soup
+from ex_56.ttb import get_xlsx_links
 
 
 @pytest.fixture
@@ -158,3 +160,56 @@ def final_modules_dataframe():
 @pytest.fixture
 def final_courses_dataframe():
     return pd.DataFrame(FINAL_EXPECTED_VIDEOS_DATAFRAMES["courses"])
+
+#
+#   TTB FIXTURES
+#
+@pytest.fixture
+def markup():
+    markup_file = Path(__file__).parent / "data_files/test.html"
+    with open(markup_file, "r") as file:
+        markup_text = file.read()
+    
+    return markup_text
+
+@pytest.fixture
+def mock_markup_request(markup, monkeypatch):
+    def mock_markup_get(url):
+        return markup
+
+    # monkeypatch the cached and noncached requests
+    monkeypatch.setattr("ex_56.ttb.get_with_cache", mock_markup_get)
+    monkeypatch.setattr("ex_56.ttb.get_without_cache", mock_markup_get)
+
+
+@pytest.fixture
+def xlsx_links(markup, mock_markup_request, cached):
+    links = get_xlsx_links(cached)
+
+    return links
+
+
+@pytest.fixture
+def test_excel_bytes():
+    spreadsheet_path = Path(__file__).parent / "data_files/test.xlsx"
+
+    with open(spreadsheet_path, "rb") as file:
+        file_bytes = file.read()
+
+    return file_bytes
+
+
+@pytest.fixture
+def mock_spreadsheet_download(monkeypatch, test_excel_bytes):
+    def mock_response(full_url, file_path, **kwargs):
+        with open(file_path, "wb") as file:
+            file.write(test_excel_bytes)
+        return str(file_path)
+
+    monkeypatch.setattr("ex_56.ttb.download_file_with_cache", mock_response)
+    monkeypatch.setattr("ex_56.ttb.download_file", mock_response)
+
+
+@pytest.fixture
+def test_download_spreadsheet(mock_spreadsheet_download, xlsx_links, tmpdir, cached):
+    download_spreadsheets_helper(mock_spreadsheet_download,xlsx_links,tmpdir, cached)

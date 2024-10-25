@@ -1,5 +1,6 @@
-from ex_56.videos import get_courses
+from ex_56.ttb import get_xlsx_links
+
 
 if __name__ == "__main__":
-    x = get_courses()
-    print(x)
+    links = get_xlsx_links(True)
+    print(links)
