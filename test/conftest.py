@@ -3,10 +3,10 @@ from pathlib import Path
 from test.data_for_tests import (
     API_DATA,
     BASE_MARKUP,
+    FINAL_EXPECTED_TTB_DATAFRAME,
     FINAL_EXPECTED_VIDEOS_DATAFRAMES,
     LINK_MARKUP,
     VIDEOS_EXPECTED_DATAFRAME_DATA,
-    FINAL_EXPECTED_TTB_DATAFRAME,
 )
 from test.helpers import download_spreadsheets_helper
 from test.mocks import MockDownloadResponse
