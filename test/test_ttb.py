@@ -6,6 +6,7 @@ from ex_56.ttb import (
     get_dataframes,
     get_filename,
     get_xlsx_links,
+    process_dataframe,
 )
 
 
@@ -29,3 +30,15 @@ def test_get_dataframes(test_download_spreadsheet, tmpdir, test_ttb_dataframe):
 
     for result in results:
         pd.testing.assert_frame_equal(result, test_ttb_dataframe)
+
+
+def test_process_dataframe(test_ttb_dataframe, test_final_ttb_dataframe):
+    result = process_dataframe(test_ttb_dataframe)
+
+    # Get the types to strings to pass the test
+    result["Total Sales"] = result["Total Sales"].astype(str)
+    test_final_ttb_dataframe["Total Sales"] = test_final_ttb_dataframe[
+        "Total Sales"
+    ].astype(str)
+
+    pd.testing.assert_frame_equal(result, test_final_ttb_dataframe)

@@ -256,3 +256,23 @@ FINAL_EXPECTED_VIDEOS_DATAFRAMES = {
         "duration": {0: 200.02, 1: 201.02},
     },
 }
+
+
+FINAL_EXPECTED_TTB_DATAFRAME = {
+    "Report Date": {1: "2022-03-09", 2: "2022-03-09", 3: "2022-03-09", 4: "2022-03-09"},
+    "Reporting Period": {
+        1: "2021-11-01",
+        2: "2021-11-01",
+        3: "2021-11-01",
+        4: "2021-11-01",
+    },
+    "Metrics": {
+        1: "Current Month",
+        2: "Prior Year Current Month",
+        3: "Current Year Cumulative to Date",
+        4: "Prior Year Cumulative to Date",
+    },
+    "Production": {1: 13094569, 2: 13402012, 3: 166237384, 4: 165389811},
+    "Stocks On Hand End-of-Month": {1: 10607001, 2: 10516402, 3: 0, 4: 0},
+    "Total Sales": {1: 2487568, 2: 2885610, 3: "N/A", 4: "N/A"},
+}

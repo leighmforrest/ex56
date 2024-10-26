@@ -6,6 +6,7 @@ from test.data_for_tests import (
     FINAL_EXPECTED_VIDEOS_DATAFRAMES,
     LINK_MARKUP,
     VIDEOS_EXPECTED_DATAFRAME_DATA,
+    FINAL_EXPECTED_TTB_DATAFRAME,
 )
 from test.helpers import download_spreadsheets_helper
 from test.mocks import MockDownloadResponse
@@ -221,3 +222,11 @@ def test_download_spreadsheet(mock_spreadsheet_download, xlsx_links, tmpdir, cac
 def test_ttb_dataframe():
     spreadsheet_path = Path(__file__).parent / "data_files/test.xlsx"
     return pd.read_excel(spreadsheet_path)
+
+
+@pytest.fixture
+def test_final_ttb_dataframe():
+    df = pd.DataFrame(FINAL_EXPECTED_TTB_DATAFRAME)
+    # Ensure Total Sales column is consistent as strings if "N/A" is expected in both
+    df["Total Sales"] = df["Total Sales"].astype(str)
+    return df
