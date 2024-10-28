@@ -1,15 +1,25 @@
 import argparse
 from pathlib import Path
 
+from ttb import get_xlsx_links, download_spreadsheets,get_dataframes, process_dataframe
+from reporting import generate_markdown_reports
+
 BASE_DIR = Path(__file__).parent.resolve()
 
+reporting_dataframes = []
 
 def videos():
     print("Now processing videos...")
 
 
-def ttb():
+def ttb(cached, target_directory):
     print("Now processing TTB data...")
+    links = get_xlsx_links(cached)
+    download_spreadsheets(links, target_directory, cached)
+    dataframes = get_dataframes(target_directory)    
+    report_df_tuples = [(process_dataframe(dataframe), f"ttb_{index}", ".0f".format,) for index, dataframe in enumerate(dataframes)]
+
+    generate_markdown_reports(target_directory, report_df_tuples)
 
 
 if __name__ == "__main__":
@@ -61,7 +71,8 @@ if __name__ == "__main__":
         target_directory.mkdir(parents=True)
         print("Directory created!")
 
-    if option_flag & 0b10:
-        videos()
-    if option_flag & 0b10:
-        ttb()
+    # if option_flag & 0b10:
+    #     videos()
+    # if option_flag & 0b10:
+    ttb(cached, target_directory)
+    generate_markdown_reports(target_directory, reporting_dataframes)
