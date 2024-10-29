@@ -17,8 +17,6 @@ def download_spreadsheets_helper(mock_spreadsheet_download, xlsx_links, tmpdir, 
     download_spreadsheets(xlsx_links, tmpdir, cached)
 
 
-def generate_test_markdown_reports(
-    tmpdir, reporting_df_tuples
-):
+def generate_test_markdown_reports(tmpdir, reporting_df_tuples):
     """Runs"""
     generate_markdown_reports(tmpdir, reporting_df_tuples)

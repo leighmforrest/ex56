@@ -15,7 +15,7 @@ def test_generate_pdf(tmpdir, reporting_df_tuples):
     tmpdir = Path(tmpdir)
     generate_test_markdown_reports(tmpdir, reporting_df_tuples)
     generate_pdf(tmpdir)
-    
+
     # Compare the number of markdown files to the number of PDF files
     length_md = len(list(tmpdir.glob("*.md")))
     length_pdf = len(list(tmpdir.glob("*.pdf")))
@@ -26,7 +26,7 @@ def test_generate_html(tmpdir, reporting_df_tuples):
     tmpdir = Path(tmpdir)
     generate_test_markdown_reports(tmpdir, reporting_df_tuples)
     generate_html(tmpdir)
-    
+
     # Compare the number of markdown files to the number of html files
     length_md = len(list(tmpdir.glob("*.md")))
     length_html = len(list(tmpdir.glob("*.html")))

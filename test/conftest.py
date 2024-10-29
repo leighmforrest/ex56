@@ -231,11 +231,14 @@ def test_final_ttb_dataframe():
     df["Total Sales"] = df["Total Sales"].astype(str)
     return df
 
+
 #
 # Reporting fixtures
 #
 @pytest.fixture
-def reporting_df_tuples(test_final_ttb_dataframe, final_modules_dataframe, final_courses_dataframe):
+def reporting_df_tuples(
+    test_final_ttb_dataframe, final_modules_dataframe, final_courses_dataframe
+):
     return [
         (test_final_ttb_dataframe, f"ttb", ".0f".format),
         (final_modules_dataframe, f"modules", "{:.3f}".format),

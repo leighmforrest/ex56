@@ -2,7 +2,12 @@ import argparse
 from pathlib import Path
 
 from ex56.reporting import generate_markdown_reports, generate_pdf, generate_html
-from ex56.ttb import download_spreadsheets, get_dataframes, get_xlsx_links, process_dataframe
+from ex56.ttb import (
+    download_spreadsheets,
+    get_dataframes,
+    get_xlsx_links,
+    process_dataframe,
+)
 from ex56.videos import (
     get_course_dataframe,
     get_lesson_dataframe,
@@ -27,7 +32,7 @@ def videos(cached):
     final_course_dataframe = process_courses_dataframe(
         final_module_dataframe, course_df
     )
-    
+
     reporting_dataframes.extend(
         [
             (lesson_df, "lessons", "{:.3f}".format),
@@ -107,10 +112,10 @@ if __name__ == "__main__":
         videos(cached)
     if option_flag & 0b01:
         ttb(cached)
-    
+
     # Generate markdown reports
     generate_markdown_reports(target_directory, reporting_dataframes)
-    
+
     # Generate the appropriate
     if report_format == "html":
         generate_html(target_directory)
