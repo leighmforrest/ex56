@@ -3,9 +3,9 @@ from test.helpers import assert_common_keys
 
 import pytest
 
-from ex_56.constants import BASE_API_URL
-from ex_56.decorators import convert_and_filter_single_item
-from ex_56.videos import request_func
+from ex56.constants import BASE_API_URL
+from ex56.decorators import convert_and_filter_single_item
+from ex56.videos import request_func
 
 
 # Function used for testing purposes only.

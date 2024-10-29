@@ -3,7 +3,7 @@ from test.data_for_tests import BASE_MARKUP, FILES, LINKS
 import pytest
 from bs4 import BeautifulSoup
 
-from ex_56.soup import get_filename, get_files_from_links, get_soup
+from ex56.soup import get_filename, get_files_from_links, get_soup
 
 
 @pytest.mark.parametrize(

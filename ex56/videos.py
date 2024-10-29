@@ -1,8 +1,8 @@
 import pandas as pd
 
-from ex_56.constants import BASE_API_URL
-from ex_56.decorators import convert_and_filter_single_item, convert_data
-from ex_56.request import get_with_cache, get_without_cache
+from ex56.constants import BASE_API_URL
+from ex56.decorators import convert_and_filter_single_item, convert_data
+from ex56.request import get_with_cache, get_without_cache
 
 get_ids = lambda data: [datum["id"] for datum in data]
 request_func = lambda cached=True: get_with_cache if cached else get_without_cache

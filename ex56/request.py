@@ -17,7 +17,6 @@ def get_full_url(url, params=None):
 
 
 def add_to_cache(response, cache_db, cache_key):
-    print(f"CACHE_DB: {type(cache_db)}")
     body = response.text
     etag = response.headers.get("ETag")
     data_dict = {"etag": etag, "body": body}

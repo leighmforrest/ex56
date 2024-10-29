@@ -4,7 +4,7 @@ from test.helpers import assert_common_keys
 import pandas as pd
 import pytest
 
-from ex_56.videos import (
+from ex56.videos import (
     ALLOWED_KEYS,
     get_course,
     get_course_dataframe,

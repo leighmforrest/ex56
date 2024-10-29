@@ -2,14 +2,14 @@ import glob
 
 import pandas as pd
 
-from ex_56.constants import BASE_URL, TTB_URL
-from ex_56.request import (
+from ex56.constants import BASE_URL, TTB_URL
+from ex56.request import (
     download_file,
     download_file_with_cache,
     get_with_cache,
     get_without_cache,
 )
-from ex_56.soup import get_filename, get_files_from_links, get_soup
+from ex56.soup import get_filename, get_files_from_links, get_soup
 
 pd.set_option("future.no_silent_downcasting", True)
 

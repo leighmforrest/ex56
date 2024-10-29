@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from ex_56.ttb import (
+from ex56.ttb import (
     download_spreadsheets,
     get_dataframes,
     get_filename,

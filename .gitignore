@@ -4,3 +4,4 @@ cache.db
 .DS_Store
 .coverage
 htmlcov
+.vscode

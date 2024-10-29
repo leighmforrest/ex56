@@ -6,7 +6,7 @@ from test.mocks import MockResponse
 import pytest
 import requests
 
-from ex_56.request import download_file_with_cache, get_with_cache, get_without_cache
+from ex56.request import download_file_with_cache, get_with_cache, get_without_cache
 
 
 @pytest.mark.parametrize("url,params,etag,data", REQUEST_SET)

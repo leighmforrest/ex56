@@ -14,8 +14,8 @@ from test.mocks import MockDownloadResponse
 import pandas as pd
 import pytest
 
-from ex_56.soup import get_soup
-from ex_56.ttb import get_xlsx_links
+from ex56.soup import get_soup
+from ex56.ttb import get_xlsx_links
 
 
 @pytest.fixture
@@ -106,8 +106,8 @@ def mock_course_api_request(monkeypatch, courses_data, course_data):
             )
         return json.dumps(courses_data)
 
-    monkeypatch.setattr("ex_56.videos.get_with_cache", mock_course_get)
-    monkeypatch.setattr("ex_56.videos.get_without_cache", mock_course_get)
+    monkeypatch.setattr("ex56.videos.get_with_cache", mock_course_get)
+    monkeypatch.setattr("ex56.videos.get_without_cache", mock_course_get)
 
 
 @pytest.fixture
@@ -120,8 +120,8 @@ def mock_module_api_request(monkeypatch, module_data):
             )
         return None
 
-    monkeypatch.setattr("ex_56.videos.get_with_cache", mock_module_get)
-    monkeypatch.setattr("ex_56.videos.get_without_cache", mock_module_get)
+    monkeypatch.setattr("ex56.videos.get_with_cache", mock_module_get)
+    monkeypatch.setattr("ex56.videos.get_without_cache", mock_module_get)
 
 
 @pytest.fixture
@@ -134,8 +134,8 @@ def mock_lesson_api_request(monkeypatch, lesson_data):
             )
         return None
 
-    monkeypatch.setattr("ex_56.videos.get_with_cache", mock_lesson_get)
-    monkeypatch.setattr("ex_56.videos.get_without_cache", mock_lesson_get)
+    monkeypatch.setattr("ex56.videos.get_with_cache", mock_lesson_get)
+    monkeypatch.setattr("ex56.videos.get_without_cache", mock_lesson_get)
 
 
 @pytest.fixture
@@ -181,8 +181,8 @@ def mock_markup_request(markup, monkeypatch):
         return markup
 
     # monkeypatch the cached and noncached requests
-    monkeypatch.setattr("ex_56.ttb.get_with_cache", mock_markup_get)
-    monkeypatch.setattr("ex_56.ttb.get_without_cache", mock_markup_get)
+    monkeypatch.setattr("ex56.ttb.get_with_cache", mock_markup_get)
+    monkeypatch.setattr("ex56.ttb.get_without_cache", mock_markup_get)
 
 
 @pytest.fixture
@@ -209,8 +209,8 @@ def mock_spreadsheet_download(monkeypatch, test_excel_bytes):
             file.write(test_excel_bytes)
         return str(file_path)
 
-    monkeypatch.setattr("ex_56.ttb.download_file_with_cache", mock_response)
-    monkeypatch.setattr("ex_56.ttb.download_file", mock_response)
+    monkeypatch.setattr("ex56.ttb.download_file_with_cache", mock_response)
+    monkeypatch.setattr("ex56.ttb.download_file", mock_response)
 
 
 @pytest.fixture
@@ -230,3 +230,14 @@ def test_final_ttb_dataframe():
     # Ensure Total Sales column is consistent as strings if "N/A" is expected in both
     df["Total Sales"] = df["Total Sales"].astype(str)
     return df
+
+#
+# Reporting fixtures
+#
+@pytest.fixture
+def reporting_df_tuples(test_final_ttb_dataframe, final_modules_dataframe, final_courses_dataframe):
+    return [
+        (test_final_ttb_dataframe, f"ttb", ".0f".format),
+        (final_modules_dataframe, f"modules", "{:.3f}".format),
+        (final_courses_dataframe, f"modules", "{:.3f}".format),
+    ]
